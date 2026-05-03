@@ -1,0 +1,1 @@
+# Build output build/ *.exe *.o *.obj # IDE files .vscode/ .idea/ *.user # OS files .DS_Store Thumbs.db
