@@ -1,0 +1,36 @@
+cmake_minimum_required(VERSION 3.10)
+
+# 1. Project Name
+project(VroomsteinRPG)
+
+# 2. Set C++ Standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# 3. Find SFML (Requires system installation of SFML)
+# We need graphics, window, system, and audio modules
+find_package(SFML 2.5 COMPONENTS graphics window system audio REQUIRED)
+
+# 4. Identify Source Files
+# Based on your image, main.cpp is in the root, but you have a /src folder
+# Add all your .cpp files here as you create them
+set(SOURCES 
+    main.cpp
+    # src/Avatar.cpp
+    # src/Hero.cpp
+    # src/Move.cpp
+)
+
+# 5. Create the Executable
+add_executable(${PROJECT_NAME} ${SOURCES})
+
+# 6. Link SFML Libraries
+target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window sfml-system sfml-audio)
+
+# 7. Copy Assets to Build Folder (Important for your sprites!)
+# This ensures your 'assets' folder is available to the .exe
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets"
+)
