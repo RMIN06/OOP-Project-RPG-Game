@@ -1,1 +1,9 @@
-# Build output build/ *.exe *.o *.obj # IDE files .vscode/ .idea/ *.user # OS files .DS_Store Thumbs.db
+# IDE settings
+.vscode/
+
+# Compiled binaries
+*.exe
+main.exe
+
+# OS generated files
+.DS_Store
