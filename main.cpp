@@ -4,6 +4,7 @@ using namespace std;
 int main()
 {
     cout<<"Hello world"<<endl;
+    cout << "i am ali junaid and doing my first commit change here"<<endl;
     sf::RenderWindow window(sf::VideoMode({200, 200}), "SFML works!");
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
