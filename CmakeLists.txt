@@ -11,15 +11,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # We need graphics, window, system, and audio modules
 find_package(SFML 2.5 COMPONENTS graphics window system audio REQUIRED)
 
+# ... (rest of the file stays the same)
+
 # 4. Identify Source Files
-# Based on your image, main.cpp is in the root, but you have a /src folder
-# Add all your .cpp files here as you create them
+# We point to the files inside the src directory
 set(SOURCES 
-    main.cpp
-    # src/Avatar.cpp
-    # src/Hero.cpp
-    # src/Move.cpp
+    src/main.cpp
+    src/Avatar.cpp
+    src/Hero.cpp
+    # Add other .cpp files here as you implement them
 )
+
+# ... (rest of the file stays the same)
 
 # 5. Create the Executable
 add_executable(${PROJECT_NAME} ${SOURCES})
