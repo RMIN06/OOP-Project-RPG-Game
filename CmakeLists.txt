@@ -1,39 +1,31 @@
 cmake_minimum_required(VERSION 3.10)
+project(VroomsteinRPG LANGUAGES CXX)
 
-# 1. Project Name
-project(VroomsteinRPG)
-
-# 2. Set C++ Standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# 3. Find SFML (Requires system installation of SFML)
-# We need graphics, window, system, and audio modules
-find_package(SFML 2.5 COMPONENTS graphics window system audio REQUIRED)
+# Gather all source files in src/
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+if(NOT SOURCES)
+    message(FATAL_ERROR "No source files found in ${CMAKE_CURRENT_SOURCE_DIR}/src")
+endif()
 
-# ... (rest of the file stays the same)
-
-# 4. Identify Source Files
-# We point to the files inside the src directory
-set(SOURCES 
-    src/main.cpp
-    src/Avatar.cpp
-    src/Hero.cpp
-    # Add other .cpp files here as you implement them
-)
-
-# ... (rest of the file stays the same)
-
-# 5. Create the Executable
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-# 6. Link SFML Libraries
-target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window sfml-system sfml-audio)
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-# 7. Copy Assets to Build Folder (Important for your sprites!)
-# This ensures your 'assets' folder is available to the .exe
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_CURRENT_SOURCE_DIR}/assets"
-    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets"
-)
+find_package(SFML 2.5 COMPONENTS graphics window system audio REQUIRED)
+if(TARGET SFML::Graphics)
+    target_link_libraries(${PROJECT_NAME} PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio)
+else()
+    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics sfml-window sfml-system sfml-audio)
+endif()
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets"
+    )
+endif()
