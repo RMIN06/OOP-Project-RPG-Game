@@ -1,15 +1,15 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
-
+using namespace std;
 int main()
 {
-    using namespace std;
+    
     
     cout<<"Hello world"<<endl;
     cout<<"hi I am Hassaan Sajid"<<endl;
     
-    sf::RenderWindow window(sf::VideoMode({200, 200}), "SFML works!");
-    std::cout << "Hello world" << std::endl;
+   
+    cout << "Hello world" << endl;
     cout << " my name is mehroze";
     sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
     sf::CircleShape shape(100.f);
