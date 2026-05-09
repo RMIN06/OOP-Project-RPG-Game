@@ -4,7 +4,7 @@
 int main()
 {
     std::cout << "Hello world" << std::endl;
-
+    cout << " my name is mehroze";
     sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
