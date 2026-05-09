@@ -15,11 +15,27 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-find_package(SFML 2.5 COMPONENTS graphics window system audio REQUIRED)
+# Don't use static SFML libraries
+set(SFML_STATIC_LIBRARIES OFF)
+
+find_package(SFML 3.1 COMPONENTS Graphics Window System Audio REQUIRED)
+
 if(TARGET SFML::Graphics)
     target_link_libraries(${PROJECT_NAME} PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio)
 else()
     target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics sfml-window sfml-system sfml-audio)
+endif()
+
+# Add Windows-specific libraries
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE winmm.lib)
+endif()
+
+# Post-build fix for m.lib on Windows
+if(WIN32)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND powershell.exe -Command "(Get-Content '${CMAKE_CURRENT_BINARY_DIR}/VroomsteinRPG.vcxproj') -replace 'm\\.lib;', '' | Set-Content '${CMAKE_CURRENT_BINARY_DIR}/VroomsteinRPG.vcxproj'"
+    )
 endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")

@@ -3,16 +3,18 @@
 
 int main()
 {
-    std::cout << "Hello world" << std::endl;
-
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+    using namespace std;
+    
+    cout<<"Hello world"<<endl;
+    cout<<"hi I am Hassaan Sajid"<<endl;
+    
+    sf::RenderWindow window(sf::VideoMode({200, 200}), "SFML works!");
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
 
     while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+        while (auto event = window.pollEvent()) {
+            if (event->is<sf::Event::Closed>())
                 window.close();
         }
 
