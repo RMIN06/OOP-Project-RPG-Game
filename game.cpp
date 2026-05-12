@@ -456,6 +456,11 @@ public:
         float bx     = pos.x - barW/2.f;
         float by     = pos.y + yOff;
 
+        if(ratio>0.f&&ration<=0.25f){
+            bx +=(rand()%5-2);
+            by +=(rand()%5-2);
+        }
+
         sf::RectangleShape bg({barW, 8.f});
         bg.setPosition(sf::Vector2f(bx, by));
         bg.setFillColor(sf::Color(40,40,40));
