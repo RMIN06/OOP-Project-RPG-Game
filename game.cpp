@@ -560,7 +560,8 @@ public:
 // ─── HeroA: The Paladin (blue, high HP, lifesteal melee) ─────────────────────
 class HeroA : public Hero {
 public:
-    HeroA() : Hero("PALADIN", 200.f, 300.f, {200, 400}, Pal::HeroA, &gHeroTextures[0]) {
+    HeroA() : Hero("PALADIN", 200.f, 300.f, {200, 400}, Pal::HeroA, &gHeroTextures[0])
+     {
         meleeMove   = new MeleeMove("Shield Bash", 35.f, 0.4f, 0.15f);
         rangedMove  = new RangedMove("Holy Bolt",  22.f, 0.6f, false);
         specialMove = new SpecialMove("Radiant Nova",50.f,3.5f,180.f);
