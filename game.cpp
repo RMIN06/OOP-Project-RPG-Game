@@ -1111,7 +1111,7 @@ public:
 
         // Stage label / boss text
         if(stage == 3){
-            drawText(win,"Dr. Vroomstein",(float)SCREEN_W/2.f,(float)SCREEN_H-22.f,13,Pal::Villain,true);
+            drawText(win,"Dr. DOOM",(float)SCREEN_W/2.f,(float)SCREEN_H-22.f,13,Pal::Villain,true);
         } else {
             drawText(win,"MINION SWARM",(float)SCREEN_W/2.f,(float)SCREEN_H-22.f,13,Pal::DimWhite,true);
         }
@@ -1276,7 +1276,7 @@ class GameLoop {
         std::ostringstream ss;
         ss<<"STAGE "<<stageNum;
         pushFlash(ss.str(), Pal::Gold);
-        if(stageNum == 3) pushFlash("DR. VROOMSTEIN ENTERS!", Pal::Villain);
+        if(stageNum == 3) pushFlash("DR. DOOM ENTERS!", Pal::Villain);
         if(stageNum == 1) playMusic("Juhani Junkala [Retro Game Music Pack] Level 1.wav");
         else if(stageNum == 2) playMusic("Juhani Junkala [Retro Game Music Pack] Level 2.wav");
         else if(stageNum == 3) playMusic("Juhani Junkala [Retro Game Music Pack] Level 3.wav");
@@ -1310,14 +1310,14 @@ class GameLoop {
         drawBackground(win,t);
 
         // Title
-        sf::Text title(font, "VROOMSTEIN RPG", 64);
+        sf::Text title(font, "Avengers Doomsday RPG", 64);
         title.setFillColor(Pal::Villain);
         sf::FloatRect tr = title.getLocalBounds();
         title.setOrigin(sf::Vector2f(tr.position.x + tr.size.x/2.f, tr.position.y + tr.size.y/2.f));
         title.setPosition(sf::Vector2f(SCREEN_W/2.f, 200.f + std::sin(t*2.f)*8.f));
         win.draw(title);
 
-        sf::Text sub(font, "DEFEAT DR. VROOMSTEIN AND HIS POLYMORPHIC MINIONS", 18);
+        sf::Text sub(font, "DEFEAT DR. DOOM AND HIS MODOKS", 18);
         sub.setFillColor(Pal::DimWhite);
         sf::FloatRect sr = sub.getLocalBounds();
         sub.setOrigin(sf::Vector2f(sr.position.x + sr.size.x/2.f, sr.position.y + sr.size.y/2.f));
@@ -1691,11 +1691,11 @@ public:
                 break;
             case GameState::WIN:
                 drawGame(gameTime);
-                drawOverlay("YOU WIN!", "Dr. Vroomstein has been defeated!", Pal::Gold, gameTime);
+                drawOverlay("YOU WIN!", "Dr. DOOM has been defeated!", Pal::Gold, gameTime);
                 break;
             case GameState::GAME_OVER:
                 drawGame(gameTime);
-                drawOverlay("GAME OVER", "The world falls to Dr. Vroomstein...", Pal::Villain, gameTime);
+                drawOverlay("GAME OVER", "The world falls to Dr. DOOM...", Pal::Villain, gameTime);
                 break;
             }
 
@@ -1712,7 +1712,7 @@ int main(){
 
     sf::RenderWindow window(
         sf::VideoMode(sf::Vector2u{SCREEN_W, SCREEN_H}),
-        "VroomsteinRPG — OOP Semester Project — BSCS 2E",
+        "Avengers Doomsday RPG Semester Project",
         sf::Style::Close | sf::Style::Titlebar
     );
     window.setFramerateLimit(60);
