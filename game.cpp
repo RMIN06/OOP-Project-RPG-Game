@@ -387,7 +387,7 @@ public:
  }
     virtual ~Avatar()
     {
-        
+
     }
 
     virtual void move(float dt, sf::Vector2f input) = 0;
@@ -399,7 +399,9 @@ public:
         currentHP -= dmg;
         hitFlash   = 0.12f;
         iframeTimer = 0.25f;
-        if(currentHP <= 0.f){ 
+
+    pushFlash("-" + to_string((int)dmg), sf::Color(255, 80, 80), sf::Vector2f(pos.x, pos.y - bodyRadius));   
+         if(currentHP <= 0.f){ 
             currentHP=0.f; dead=true; 
         }
     }
