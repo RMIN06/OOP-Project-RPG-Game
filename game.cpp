@@ -429,7 +429,8 @@ public:
         float bx     = pos.x - barW/2.f;
         float by     = pos.y + yOff;
 
-        if(ratio>0.f&&ration<=0.25f){
+        if(ratio>0.f&&ratio<=0.25f)
+        {
             bx +=(rand()%5-2);
             by +=(rand()%5-2);
         }
