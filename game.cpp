@@ -429,12 +429,7 @@ public:
         float bx     = pos.x - barW/2.f;
         float by     = pos.y + yOff;
 
-<<<<<<< HEAD
         if(ratio>0.f&&ratio<=0.25f){
-=======
-        if(ratio>0.f&&ratio<=0.25f)
-        {
->>>>>>> b089afe4f7628826aec7bb706aca9a31921c1af8
             bx +=(rand()%5-2);
             by +=(rand()%5-2);
         }
@@ -888,9 +883,9 @@ public:
        
         float ratio = getHPRatio();
         int shouldHaveSummoned = 0;
-        if(ratio < 0.80f) 
+        if(ratio < 0.65f) 
        {
-        shouldHaveSummoned = 3;
+        shouldHaveSummoned = 1;
        } 
         if(ratio < 0.30f) 
         {
