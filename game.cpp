@@ -349,14 +349,14 @@ public:
     virtual ~Avatar(){}
 
     // Pure virtuals
-    virtual void move(fl    oat dt, sf::Vector2f input) = 0;
+    virtual void move(float dt, sf::Vector2f input) = 0;
     virtual void attack(sf::Vector2f dir)            = 0;
     virtual void render(sf::RenderWindow& win)       = 0;
 
     // Common
     virtual void takeDamage(float dmg){
-if(dead || iframeTimer > 0.f) return;     
-   currentHP -= dmg;
+        if(dead || iframeTimer > 0.f) return;     
+        currentHP -= dmg;
         hitFlash   = 0.12f;
         iframeTimer = 0.25f;
         if(currentHP <= 0.f){ 
