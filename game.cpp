@@ -228,7 +228,7 @@ public:
 
     virtual void trigger(sf::Vector2f from, sf::Vector2f dir) = 0;
     virtual string getName()  const = 0;
-    virtual float getMult()  const = 0;  // score multiplier
+    virtual float getMult()  const = 0; 
 
     bool isReady() const
     { 
@@ -1232,32 +1232,38 @@ void drawPowerUps(sf::RenderWindow& win, std::vector<PowerUp>& pups, float dt){
 // ─────────────────────────────────────────────────────────────────────────────
 class GameLoop {
     sf::RenderWindow& win;
-    sf::Font&         font;
-    HUD               hud;
+    sf::Font& font;
+    HUD hud;
 
-    GameState   state;
-    int         selectedHero;
-    int         stage;
-    float       waveTimer;
-    float       powerUpTimer;
-    float       gameTime;
-    sf::Music   bgMusic;
+    GameState state;
+    int selectedHero;
+    int stage;
+    float waveTimer;
+    float powerUpTimer;
+    float gameTime;
+    sf::Music bgMusic;
     std::string currentMusicPath;
 
-    Hero*              hero;
-    Villain*           villain;
-    std::vector<Minion*> minions;
+    Hero* hero;
+    Villain* villain;
+    vector<Minion*> minions;
 
-    sf::Vector2f  aimDir;   // last known aim direction (toward mouse or auto)
+    sf::Vector2f  aimDir; 
 
-    void clearMinions(){
+    void clearMinions()
+    {
         for(auto* m : minions) delete m;
         minions.clear();
     }
 
-    void playMusic(const std::string& path){
-        if(currentMusicPath == path && bgMusic.getStatus() == sf::SoundSource::Status::Playing) return;
-        if(bgMusic.openFromFile(path)){
+    void playMusic(const string& path)
+    {
+        if(currentMusicPath == path && bgMusic.getStatus() == sf::SoundSource::Status::Playing)
+        {
+            return;
+        }
+        if(bgMusic.openFromFile(path))
+        {
             bgMusic.setLooping(true);
             bgMusic.play();
             currentMusicPath = path;
@@ -1267,60 +1273,137 @@ class GameLoop {
     void spawnWave(int stageNum){
         clearMinions();
         int count = 4 + stageNum*2;
-        if(stageNum == 1) count = 5;
-        else if(stageNum == 2) count = 8;
-        else if(stageNum == 3) count = 5;
+        if(stageNum == 1)
+        {
+            count = 5;
+        } 
+        else if(stageNum == 2)
+        {
+            count = 8;
+        }
+         
+        else if(stageNum == 3) 
+        {
+            count = 5;
+        }
 
-        for(int i=0;i<count;i++){
+        for(int i=0;i<count;i++)
+        {
             // Spawn from random screen edge
             sf::Vector2f spawnPos;
             int edge = rand()%4;
-            if(edge==0) spawnPos = {randf(0,SCREEN_W), 90.f};
-            else if(edge==1) spawnPos = {(float)SCREEN_W-20.f, randf(120,SCREEN_H)};
-            else if(edge==2) spawnPos = {randf(0,SCREEN_W), (float)SCREEN_H-20.f};
-            else  spawnPos = {20.f, randf(120,SCREEN_H)};
+            if(edge==0) 
+            {
+                spawnPos = {randf(0,SCREEN_W), 90.f};
+
+            }
+            else if(edge==1)
+            {
+                spawnPos = {(float)SCREEN_W-20.f, randf(120,SCREEN_H)};
+            } 
+            else if(edge==2)
+            {
+                spawnPos = {randf(0,SCREEN_W), (float)SCREEN_H-20.f};
+            } 
+            else
+            {
+                spawnPos = {20.f, randf(120,SCREEN_H)};
+            }  
 
             sf::Vector2f fOff = {randf(-80,80), randf(-60,60)};
             int type = i % 3;
-            if(type==0)      minions.push_back(new MinionV(spawnPos, fOff, &gMinionTexture));
-            else if(type==1) minions.push_back(new MinionW(spawnPos, fOff, &gMinionTexture));
-            else             minions.push_back(new MinionL(spawnPos, fOff, &gMinionTexture));
+            if(type==0)
+            {
+                 minions.push_back(new MinionV(spawnPos, fOff, &gMinionTexture));
+            }     
+            else if(type==1)
+            {
+                minions.push_back(new MinionW(spawnPos, fOff, &gMinionTexture));
+            } 
+            else
+            {
+                minions.push_back(new MinionL(spawnPos, fOff, &gMinionTexture));
+            }
+
         }
+
         std::ostringstream ss;
         ss<<"STAGE "<<stageNum<<" — "<<count<<" MINIONS!";
         pushFlash(ss.str(), Pal::Gold);
     }
 
-    void setupStage(int stageNum){
+    void setupStage(int stageNum)
+    {
         if(stageNum < 3){
-            if(villain){ delete villain; villain = nullptr; }
-        } else {
+            if(villain)
+            { 
+                delete villain; villain = nullptr; 
+            }
+        } 
+
+        else 
+        {
             setupVillain();
         }
+
         stage = stageNum;
         waveTimer = 5.f;
         spawnWave(stageNum);
         std::ostringstream ss;
         ss<<"STAGE "<<stageNum;
         pushFlash(ss.str(), Pal::Gold);
-        if(stageNum == 3) pushFlash("DR. VROOMSTEIN ENTERS!", Pal::Villain);
-        if(stageNum == 1) playMusic("Juhani Junkala [Retro Game Music Pack] Level 1.wav");
-        else if(stageNum == 2) playMusic("Juhani Junkala [Retro Game Music Pack] Level 2.wav");
-        else if(stageNum == 3) playMusic("Juhani Junkala [Retro Game Music Pack] Level 3.wav");
+
+        if(stageNum == 3)
+        {
+            pushFlash("DR. VROOMSTEIN ENTERS!", Pal::Villain);
+        } 
+        if(stageNum == 1)
+        {
+            playMusic("Juhani Junkala [Retro Game Music Pack] Level 1.wav");
+        } 
+        else if(stageNum == 2)
+        {
+            playMusic("Juhani Junkala [Retro Game Music Pack] Level 2.wav");
+        } 
+        else if(stageNum == 3)
+        {
+            playMusic("Juhani Junkala [Retro Game Music Pack] Level 3.wav");
+        } 
     }
 
-    void setupVillain(){
+    void setupVillain()
+    {
         if(villain) delete villain;
         villain = new Villain(&gVroomsteinTexture);
         villain->setSummonCallback([this]{ spawnWave(stage); });
     }
 
-    void createHero(int sel){
-        if(hero) delete hero;
-        switch(sel){
-        case 0: hero = new HeroA(); break;
-        case 1: hero = new HeroB(); break;
-        default: hero = new HeroC(); break;
+    void createHero(int sel)
+    {
+        if(hero)
+        {
+            delete hero;
+        } 
+
+        switch(sel)
+        {
+        case 0:
+        {
+            hero = new HeroA();
+            break;
+        }
+       
+        case 1: 
+        {
+            hero = new HeroB();
+            break;
+        }
+        default: 
+        {
+            hero = new HeroC();
+            break;
+        }
+
         }
         gScore.total=0; gScore.streak=0; gScore.streakMult=1.f;
         gProjectiles.clear();
@@ -1333,7 +1416,8 @@ class GameLoop {
     }
 
     // ── Menu screens ─────────────────────────────────────────────────────────
-    void drawMenu(float t){
+    void drawMenu(float t)
+    {
         drawBackground(win,t);
 
         // Title
@@ -1731,20 +1815,22 @@ public:
     }
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  ENTRY POINT
-// ─────────────────────────────────────────────────────────────────────────────
+
+
+
+
+
+
+
+
+
 int main(){
     srand((unsigned)time(nullptr));
 
-    sf::RenderWindow window(
-        sf::VideoMode(sf::Vector2u{SCREEN_W, SCREEN_H}),
-        "VroomsteinRPG — OOP Semester Project — BSCS 2E",
-        sf::Style::Close | sf::Style::Titlebar
-    );
+    sf::RenderWindow window(sf::VideoMode(sf::Vector2u{SCREEN_W, SCREEN_H}), "VroomsteinRPG — OOP Semester Project — BSCS 2E", sf::Style::Close | sf::Style::Titlebar);
     window.setFramerateLimit(60);
 
-    // Load font — try common system fonts, fallback to default
+
     sf::Font font;
     bool fontLoaded = false;
     const char* fontPaths[] = {
@@ -1756,22 +1842,42 @@ int main(){
         "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
         "/System/Library/Fonts/Menlo.ttc",
     };
-    for(auto* path : fontPaths){
-        if(font.openFromFile(path)){ fontLoaded=true; break; }
+    for(auto* path : fontPaths)
+    {
+        if(font.openFromFile(path))
+        { 
+            fontLoaded=true; break; 
+        }
     }
-    if(!fontLoaded){
+
+    if(!fontLoaded)
+    {
         std::cerr<<"[WARN] Could not load any system font. Text may not render.\n";
         std::cerr<<"       Place a .ttf file named 'font.ttf' next to the exe and recompile,\n";
         std::cerr<<"       or install DejaVu fonts (Linux: sudo apt install fonts-dejavu)\n";
-        // Try local fallback
         (void)font.openFromFile("font.ttf");
     }
 
-    if(!gHeroTextures[0].loadFromFile("hero1.png")) std::cerr<<"[WARN] hero1.png not found\n";
-    if(!gHeroTextures[1].loadFromFile("hero2.png")) std::cerr<<"[WARN] hero2.png not found\n";
-    if(!gHeroTextures[2].loadFromFile("hero3.png")) std::cerr<<"[WARN] hero3.png not found\n";
-    if(!gMinionTexture.loadFromFile("minions.png")) std::cerr<<"[WARN] minions.png not found\n";
-    if(!gVroomsteinTexture.loadFromFile("vroomstein.png")) std::cerr<<"[WARN] vroomstein.png not found\n";
+    if(!gHeroTextures[0].loadFromFile("hero1.png"))
+    {
+        cerr<<"[WARN] hero1.png not found\n";
+    } 
+    if(!gHeroTextures[1].loadFromFile("hero2.png"))
+    {
+        cerr<<"[WARN] hero2.png not found\n";
+    } 
+    if(!gHeroTextures[2].loadFromFile("hero3.png"))
+    {
+        cerr<<"[WARN] hero3.png not found\n";
+    } 
+    if(!gMinionTexture.loadFromFile("minions.png"))
+    {
+        cerr<<"[WARN] minions.png not found\n";
+    } 
+    if(!gVroomsteinTexture.loadFromFile("vroomstein.png"))
+    {
+        cerr<<"[WARN] vroomstein.png not found\n";
+    }
 
     GameLoop game(window, font);
     game.run();
@@ -1779,40 +1885,7 @@ int main(){
     return 0;
 }
 
-/*
-=============================================================================
-  COMPILATION QUICK REFERENCE
-=============================================================================
-
-  WINDOWS (in VS Code terminal, MinGW-w64):
-  ------------------------------------------
-  Compile:
-    g++ -o VroomsteinRPG VroomsteinRPG.cpp ^
-        -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system ^
-        -std=c++17 -O2
-
-  If SFML is in a custom path (e.g. C:\SFML-2.6.2\):
-    g++ -o VroomsteinRPG VroomsteinRPG.cpp ^
-        -I"C:\SFML-2.6.2\include" ^
-        -L"C:\SFML-2.6.2\lib" ^
-        -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system ^
-        -std=c++17 -O2
-
-  Then copy SFML DLLs next to the .exe:
-    C:\SFML-2.6.2\bin\*.dll  ->  same folder as VroomsteinRPG.exe
-
-  Run:
-    .\VroomsteinRPG.exe
-
-  LINUX:
-  -------
-    sudo apt install libsfml-dev    (if not installed)
-    g++ -o VroomsteinRPG VroomsteinRPG.cpp \
-        -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system \
-        -std=c++17 -O2
-    ./VroomsteinRPG
-
-=============================================================================
+/*=============================================================================
   OOP REQUIREMENTS MET:
     Abstract base Avatar  -> pure virtual move(), attack(), render()
     Abstract base Move    -> pure virtual trigger(), getName(), getMult()
