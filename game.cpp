@@ -376,7 +376,7 @@ protected:
     float        bodyRadius;
     float  iframeTimer;
     bool         dead;
-    float        hitFlash;   // seconds to flash white on hit
+    float        hitFlash;   
     const sf::Texture* spriteTexture;
 
 public:
@@ -386,12 +386,11 @@ public:
     const sf::Texture* getTexture() const { return spriteTexture; }
     virtual ~Avatar(){}
 
-    // Pure virtuals
     virtual void move(float dt, sf::Vector2f input) = 0;
     virtual void attack(sf::Vector2f dir)            = 0;
     virtual void render(sf::RenderWindow& win)       = 0;
 
-    // Common
+
     virtual void takeDamage(float dmg){
         if(dead || iframeTimer > 0.f) return;     
         currentHP -= dmg;
@@ -416,7 +415,6 @@ public:
         return sf::FloatRect(sf::Vector2f(pos.x-bodyRadius, pos.y-bodyRadius), sf::Vector2f(bodyRadius*2, bodyRadius*2));
     }
 
-    // Bounds clamp — clamp to screen
     void clampToScreen(){
         pos.x = clampf(pos.x, bodyRadius, SCREEN_W-bodyRadius);
         pos.y = clampf(pos.y, 120.f+bodyRadius, SCREEN_H-bodyRadius);
