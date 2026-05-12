@@ -447,6 +447,16 @@ public:
         win.draw(fill);
     }
 
+    void drawShadow(sf::RenderWindow& win) const 
+    {
+        sf::CircleShape shadow(bodyRadius);
+        shadow.setOrigin(sf::Vector2f(bodyRadius, bodyRadius));
+        shadow.setPosition(sf::Vector2f(pos.x, pos.y + bodyRadius * 0.8f)); // Push to feet
+        shadow.setScale(sf::Vector2f(1.0f, 0.4f)); 
+        shadow.setFillColor(sf::Color(0, 0, 0, 100)); 
+        win.draw(shadow);
+    }
+
     void tickFlash(float dt)
     { 
         if(hitFlash>0.f) hitFlash -= dt; 
@@ -569,6 +579,7 @@ public:
 
     void render(sf::RenderWindow& win) override 
     {
+        drawShadow(win);
         const sf::Texture* tex = getTexture();
         if(tex)
         {
@@ -707,6 +718,7 @@ public:
     sf::Vector2f getFormationOffset() const { return formationOffset; }
 
     void render(sf::RenderWindow& win) override {
+        drawShadow(win);
         const sf::Texture* tex = getTexture();
         if(tex){
             sf::Sprite sprite(*tex);
@@ -958,6 +970,7 @@ public:
 
     void render(sf::RenderWindow& win) override 
     {
+        drawShadow(win);
         const sf::Texture* tex = getTexture();
         float r = bodyRadius;
         if(tex){
