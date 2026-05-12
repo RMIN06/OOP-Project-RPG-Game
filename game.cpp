@@ -11,10 +11,6 @@
     g++ -o VroomsteinRPG VroomsteinRPG.cpp -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system -std=c++17
     .\VroomsteinRPG.exe
 
-  Linux:
-    g++ -o VroomsteinRPG VroomsteinRPG.cpp -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system -std=c++17
-    ./VroomsteinRPG
-
   Make sure SFML 2.x is installed and headers/libs are on your path.
 
 =============================================================================
@@ -57,14 +53,15 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+using namespace std;
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  CONSTANTS
 // ─────────────────────────────────────────────────────────────────────────────
 const unsigned SCREEN_W   = 1280;
 const unsigned SCREEN_H   = 720;
-const float    FIXED_DT   = 1.f / 60.f;
-const float    PI         = 3.14159265f;
+const float FIXED_DT = 1.f / 60.f;
+const float PI = 3.14159265f;
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  COLOUR PALETTE
@@ -95,9 +92,19 @@ namespace Pal {
 // ─────────────────────────────────────────────────────────────────────────────
 //  UTILITY
 // ─────────────────────────────────────────────────────────────────────────────
-inline float clampf(float v, float lo, float hi){ return v<lo?lo:v>hi?hi:v; }
-inline float lerpf (float a, float b, float t)  { return a + (b-a)*t; }
-inline float randf (float lo, float hi)          { return lo+(hi-lo)*(rand()/(float)RAND_MAX); }
+inline float clampf(float v, float lo, float hi)
+{ 
+    return v<lo?lo:v>hi?hi:v; 
+}
+inline float lerpf (float a, float b, float t) 
+{
+    return a + (b-a)*t; 
+}
+inline float randf (float lo, float hi)          
+{ 
+    return lo+(hi-lo)*(rand()/(float)RAND_MAX);
+}
+
 inline float length(sf::Vector2f v){ return std::sqrt(v.x*v.x+v.y*v.y); }
 inline sf::Vector2f normalize(sf::Vector2f v){
     float l=length(v); return l>0.f?sf::Vector2f(v.x/l,v.y/l):sf::Vector2f(0,0);
@@ -125,15 +132,16 @@ sf::Color hpColor(float ratio){
 //  FLASH MESSAGE SYSTEM
 // ─────────────────────────────────────────────────────────────────────────────
 struct FlashMsg {
-    std::string text;
-    sf::Color   color;
-    float       ttl;
-    float       maxTTL;
+    string text;
+    sf::Color color;
+    float ttl;
+    float maxTTL;
     sf::Vector2f pos;
 };
-std::deque<FlashMsg> gFlash;
+deque<FlashMsg> gFlash;
 
-void pushFlash(const std::string& t, sf::Color c={255,255,255}, sf::Vector2f p={640,320}){
+void pushFlash(const string& t, sf::Color c={255,255,255}, sf::Vector2f p={640,320})
+{
     gFlash.push_back({t, c, 1.8f, 1.8f, p});
     if(gFlash.size()>6) gFlash.pop_front();
 }
@@ -142,19 +150,26 @@ void pushFlash(const std::string& t, sf::Color c={255,255,255}, sf::Vector2f p={
 //  SCORE SYSTEM
 // ─────────────────────────────────────────────────────────────────────────────
 struct ScoreSystem {
-    int   total       = 0;
-    int   streak      = 0;
-    float streakMult  = 1.f;
+    int total = 0;
+    int streak = 0;
+    float streakMult = 1.f;
 
     void addHit(float damage, float moveMult){
         streak++;
         streakMult = 1.f + (streak/10)*0.5f;
         int pts = (int)(damage * moveMult * streakMult);
-        total  += pts;
+        total += pts;
     }
-    void resetStreak(){ streak=0; streakMult=1.f; }
-    std::string str() const {
-        std::ostringstream ss; ss<<"SCORE: "<<total; return ss.str();
+    void resetStreak()
+    { 
+        streak=0; 
+        streakMult=1.f; 
+    }
+    string str() const 
+    {
+        ostringstream ss; 
+        ss <<"SCORE: "<< total;
+        return ss.str();
     }
 } gScore;
 
@@ -164,22 +179,21 @@ struct ScoreSystem {
 struct Projectile {
     sf::Vector2f pos;
     sf::Vector2f vel;
-    float        damage;
-    float        radius;
-    bool         active;
-    bool         friendly;   // true = hero fired, false = enemy fired
-    bool         piercing;
-    sf::Color    color;
+    float damage;
+    float radius;
+    bool active;
+    bool friendly;   // true = hero fired, false = enemy fired
+    bool piercing;
+    sf::Color color;
 
     sf::FloatRect bounds() const {
         return sf::FloatRect(sf::Vector2f(pos.x-radius, pos.y-radius), sf::Vector2f(radius*2, radius*2));
     }
 };
-std::vector<Projectile> gProjectiles;
+vector<Projectile> gProjectiles;
 
-void spawnProjectile(sf::Vector2f pos, sf::Vector2f vel, float dmg,
-                     bool friendly, bool piercing=false,
-                     float radius=8.f, sf::Color col=Pal::Projectile){
+void spawnProjectile(sf::Vector2f pos, sf::Vector2f vel, float dmg, bool friendly, bool piercing=false, float radius=8.f, sf::Color col=Pal::Projectile)
+{
     gProjectiles.push_back({pos,vel,dmg,radius,true,friendly,piercing,col});
 }
 
@@ -189,11 +203,11 @@ void spawnProjectile(sf::Vector2f pos, sf::Vector2f vel, float dmg,
 enum class PowerKind { Shield, AttackBoost, SpeedBoost };
 struct PowerUp {
     sf::Vector2f pos;
-    PowerKind    kind;
-    bool         active;
-    float        pulseT;
+    PowerKind kind;
+    bool active;
+    float pulseT;
 };
-std::vector<PowerUp> gPowerUps;
+vector<PowerUp> gPowerUps;
 
 sf::Texture gHeroTextures[3];
 sf::Texture gMinionTexture;
@@ -205,38 +219,53 @@ void spawnPowerUp(){
     gPowerUps.push_back({p,k,true,0.f});
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  ABSTRACT BASE: Move
-// ─────────────────────────────────────────────────────────────────────────────
+
+
 class Move {
 protected:
-    std::string name;
-    float       damage;
-    float       cooldown;
-    float       range;
-    int         animState;
-    sf::Clock   clock;
+    string name;
+    float damage;
+    float cooldown;
+    float range;
+    int animState;
+    sf::Clock clock;
 
 public:
-    Move(const std::string& n, float dmg, float cd, float rng)
-        : name(n), damage(dmg), cooldown(cd), range(rng), animState(0) {}
+    Move(const string& n, float dmg, float cd, float rng) : name(n), damage(dmg), cooldown(cd), range(rng), animState(0) {}
     virtual ~Move(){}
 
-    virtual void        trigger(sf::Vector2f from, sf::Vector2f dir) = 0;
-    virtual std::string getName()  const = 0;
-    virtual float       getMult()  const = 0;  // score multiplier
+    virtual void trigger(sf::Vector2f from, sf::Vector2f dir) = 0;
+    virtual string getName()  const = 0;
+    virtual float getMult()  const = 0;  // score multiplier
 
-    bool  isReady()  const { return clock.getElapsedTime().asSeconds() >= cooldown; }
-    float getCooldownRatio() const {
+    bool isReady() const
+    { 
+        return clock.getElapsedTime().asSeconds() >= cooldown; 
+    }
+    float getCooldownRatio() const 
+    {
         return clampf(clock.getElapsedTime().asSeconds()/cooldown, 0.f, 1.f);
     }
-    float    getDamage()   const { return damage; }
-    float    getCooldown() const { return cooldown; }
-    void     resetClock()        { clock.restart(); }
-    std::string getDisplayName() const { return name; }
+    float getDamage() const 
+    { 
+        return damage; 
+    }
+    float getCooldown() const 
+    { 
+        return cooldown; 
+    }
+    void resetClock()        
+    { 
+        clock.restart(); 
+    }
+    string getDisplayName() const 
+    { 
+        return name; 
+    }
 };
 
-// ─── MeleeMove ───────────────────────────────────────────────────────────────
+
+
 class MeleeMove : public Move {
     float lifesteal;
 public:
