@@ -1,17 +1,9 @@
 /*
 =============================================================================
-  VroomsteinRPG.cpp
-  OOP Semester 2 Project — BSCS 2E — NUST Faisalabad
+
+  OOP Semester 2 Project — BSCS 2E 
   Single-file SFML game: All graphics procedurally drawn (no assets needed)
 =============================================================================
-
-  HOW TO COMPILE & RUN (VS Code terminal):
-  -----------------------------------------
-  Windows (MinGW-w64):
-    g++ -o VroomsteinRPG VroomsteinRPG.cpp -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system -std=c++17
-    .\VroomsteinRPG.exe
-
-  Make sure SFML 2.x is installed and headers/libs are on your path.
 
 =============================================================================
   CONTROLS:
