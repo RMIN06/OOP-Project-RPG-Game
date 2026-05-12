@@ -422,7 +422,7 @@ protected:
 public:
     Hero(const std::string& n, float spd, float hp,
          sf::Vector2f startPos, sf::Color col, const sf::Texture* tex=nullptr)
-        : Avatar(n, spd, hp, startPos, 22.f, tex),
+        : Avatar(n, spd, hp, startPos, 40.f, tex),
           meleeMove(nullptr), rangedMove(nullptr), specialMove(nullptr),
           speedMult(1.f), shielded(false), attackBoost(1.f), speedBoost(1.f),
           powerTimer(0.f), bodyColor(col), animT(0.f) 
@@ -784,7 +784,7 @@ class Villain : public Avatar {
 
 public:
     Villain(const sf::Texture* tex=nullptr)
-        : Avatar("Dr. Vroomstein", 150.f, 1200.f, {SCREEN_W/2.f, 200.f}, 38.f, tex),
+        : Avatar("Dr. Vroomstein", 150.f, 1200.f, {SCREEN_W/2.f, 200.f}, 60.f, tex),
           state(VillainState::IDLE), stateTimer(2.f), moveTimer(0.f),
           targetPos(SCREEN_W/2.f, 200.f), animT(0.f), summonThreshold(3),
           summonsSent(0), shootTimer(0.f), chargeSpeed(0.f),
