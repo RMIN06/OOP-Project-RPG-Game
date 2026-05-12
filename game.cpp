@@ -336,6 +336,7 @@ protected:
     float        currentHP;
     sf::Vector2f pos;
     float        bodyRadius;
+    float  iframeTimer;
     bool         dead;
     float        hitFlash;   // seconds to flash white on hit
     const sf::Texture* spriteTexture;
@@ -343,21 +344,24 @@ protected:
 public:
     Avatar(const std::string& n, float spd, float hp, sf::Vector2f startPos, float r, const sf::Texture* tex = nullptr)
         : name(n), baseSpeed(spd), maxHP(hp), currentHP(hp),
-          pos(startPos), bodyRadius(r), dead(false), hitFlash(0.f), spriteTexture(tex) {}
+          pos(startPos), bodyRadius(r), dead(false), hitFlash(0.f), iframeTimer(0.f), spriteTexture(tex) {}
     const sf::Texture* getTexture() const { return spriteTexture; }
     virtual ~Avatar(){}
 
     // Pure virtuals
-    virtual void move(float dt, sf::Vector2f input) = 0;
+    virtual void move(fl    oat dt, sf::Vector2f input) = 0;
     virtual void attack(sf::Vector2f dir)            = 0;
     virtual void render(sf::RenderWindow& win)       = 0;
 
     // Common
     virtual void takeDamage(float dmg){
-        if(dead) return;
-        currentHP -= dmg;
+if(dead || iframeTimer > 0.f) return;     
+   currentHP -= dmg;
         hitFlash   = 0.12f;
-        if(currentHP <= 0.f){ currentHP=0.f; dead=true; }
+        iframeTimer = 0.25f;
+        if(currentHP <= 0.f){ 
+            currentHP=0.f; dead=true; 
+        }
     }
     void healHP(float amt){
         currentHP = clampf(currentHP+amt, 0.f, maxHP);
@@ -398,7 +402,11 @@ public:
         win.draw(fill);
     }
 
-    void tickFlash(float dt){ if(hitFlash>0.f) hitFlash -= dt; }
+    void tickFlash(float dt)
+    { 
+        if(hitFlash>0.f) hitFlash -= dt; 
+        if(iframeTimer>0.f) iframeTimer -= dt;
+    }
     sf::Color flashTint() const { return hitFlash>0.f ? sf::Color::White : sf::Color(0,0,0,0); }
 };
 
