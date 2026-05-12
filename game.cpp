@@ -718,20 +718,23 @@ public:
 
 // ─── MinionW: Wave sinusoidal path ────────────────────────────────────────────
 class MinionW : public Minion {
-    float waveT;
-    float baseY;
-    float dirX;
+    float track;
+    float verticalpos;
+    float horizontalpos;
 public:
-    MinionW(sf::Vector2f startPos, sf::Vector2f fOffset, const sf::Texture* tex)
+
+// more speed but less HP than vbot, moves in a horizontal wave pattern across the screen, bouncing off edges.  
+
+MinionW(sf::Vector2f startPos, sf::Vector2f fOffset, const sf::Texture* tex)
         : Minion("Wavebot", 140.f, 40.f, startPos, Pal::MinionW, 10.f, fOffset, tex),
-          waveT(randf(0,PI*2)), baseY(startPos.y), dirX(startPos.x>SCREEN_W/2?-1.f:1.f) {}
+          track(randf(0,PI*2)), verticalpos(startPos.y),horizontalpos(startPos.x>SCREEN_W/2?-1.f:1.f) {}
 
     void move(float dt, sf::Vector2f heroPos) override {
-        waveT += dt*3.f;
-        pos.x += dirX * speed * dt;
-        pos.y  = heroPos.y + formationOffset.y + std::sin(waveT)*80.f;
+        track += dt*3.f;
+        pos.x += horizontalpos * speed * dt;
+        pos.y  = heroPos.y + formationOffset.y + std::sin(track)*80.f;
         // When too far, wrap or chase
-        if(pos.x < 50.f || pos.x > SCREEN_W-50.f) dirX *= -1.f;
+        if(pos.x < 50.f || pos.x > SCREEN_W-50.f)  horizontalpos*= -1.f;
         clampToScreen();
         animT += dt;
     }
@@ -742,7 +745,8 @@ class MinionL : public Minion {
     float sweepT;
     float startX;
 public:
-    MinionL(sf::Vector2f startPos, sf::Vector2f fOffset, const sf::Texture* tex)
+// more health less speed and moves in a linear pattern.    
+MinionL(sf::Vector2f startPos, sf::Vector2f fOffset, const sf::Texture* tex)
         : Minion("Linebot", 100.f, 60.f, startPos, Pal::MinionL, 12.f, fOffset, tex),
           sweepT(randf(0,PI*2)), startX(startPos.x) {}
 
@@ -750,7 +754,7 @@ public:
         sweepT += dt*1.5f;
         // Parabolic arc toward hero
         sf::Vector2f desired(heroPos.x + formationOffset.x,
-                             heroPos.y + formationOffset.y + std::cos(sweepT)*60.f);
+        heroPos.y + formationOffset.y + cos(sweepT)*60.f);
         sf::Vector2f dir = normalize(desired - pos);
         pos += dir * speed * dt;
         clampToScreen();
