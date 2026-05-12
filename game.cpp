@@ -1386,10 +1386,11 @@ class GameLoop {
             win.draw(card);
 
             // Mini hero preview
-            sf::CircleShape preview(sel ? 38.f : 32.f);
-            preview.setOrigin(sf::Vector2f(preview.getRadius(),preview.getRadius()));
+            sf::Sprite preview(gHeroTextures[i]);
+            preview.setOrigin(sf::Vector2f(preview.getGlobalBounds().width/2.f, preview.getGlobalBounds().height/2.f));
             preview.setPosition(sf::Vector2f(cx, cy-60.f));
-            preview.setFillColor(heroes[i].col);
+            float scale = sel ? 0.35f : 0.3f;
+            preview.setScale(scale, scale);
             win.draw(preview);
 
             hud.drawText(win, std::to_string(heroes[i].key)+". "+heroes[i].name,
