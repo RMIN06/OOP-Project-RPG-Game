@@ -363,9 +363,7 @@ public:
     }
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
 //  ABSTRACT BASE: Avatar
-// ─────────────────────────────────────────────────────────────────────────────
 class Avatar {
 protected:
     std::string  name;
@@ -376,22 +374,26 @@ protected:
     float        bodyRadius;
     float  iframeTimer;
     bool         dead;
-    float        hitFlash;   // seconds to flash white on hit
+    float        hitFlash;
     const sf::Texture* spriteTexture;
 
 public:
     Avatar(const std::string& n, float spd, float hp, sf::Vector2f startPos, float r, const sf::Texture* tex = nullptr)
         : name(n), baseSpeed(spd), maxHP(hp), currentHP(hp),
           pos(startPos), bodyRadius(r), dead(false), hitFlash(0.f), iframeTimer(0.f), spriteTexture(tex) {}
-    const sf::Texture* getTexture() const { return spriteTexture; }
-    virtual ~Avatar(){}
+    const sf::Texture* getTexture() const
+     {
+         return spriteTexture;
+ }
+    virtual ~Avatar()
+    {
+        
+    }
 
-    // Pure virtuals
     virtual void move(float dt, sf::Vector2f input) = 0;
     virtual void attack(sf::Vector2f dir)            = 0;
     virtual void render(sf::RenderWindow& win)       = 0;
 
-    // Common
     virtual void takeDamage(float dmg){
         if(dead || iframeTimer > 0.f) return;     
         currentHP -= dmg;
@@ -401,29 +403,52 @@ public:
             currentHP=0.f; dead=true; 
         }
     }
-    void healHP(float amt){
+    void healHP(float amt)
+    {
         currentHP = clampf(currentHP+amt, 0.f, maxHP);
     }
-    bool  isDead()       const { return dead; }
-    float getHP()        const { return currentHP; }
-    float getMaxHP()     const { return maxHP; }
-    float getHPRatio()   const { return currentHP/maxHP; }
-    sf::Vector2f getPos()const { return pos; }
-    float getRadius()    const { return bodyRadius; }
-    std::string getName()const { return name; }
+    bool  isDead() const
+     { 
+        return dead; 
+    }
+    float getHP() const 
+    { 
+        return currentHP; 
+    }
+    float getMaxHP() const
+    {
+         return maxHP;
+   }
+    float getHPRatio() const
+     { 
+        return currentHP/maxHP;
+     }
+    sf::Vector2f getPos()const
+     { 
+        return pos; 
+    }
+    float getRadius() const 
+    {
+         return bodyRadius;
+ }
+    std::string getName()const 
+    { 
+        return name;
+     }
 
-    sf::FloatRect bounds() const {
+    sf::FloatRect bounds() const
+    {
         return sf::FloatRect(sf::Vector2f(pos.x-bodyRadius, pos.y-bodyRadius), sf::Vector2f(bodyRadius*2, bodyRadius*2));
     }
 
-    // Bounds clamp — clamp to screen
-    void clampToScreen(){
+    void clampToScreen()
+    {
         pos.x = clampf(pos.x, bodyRadius, SCREEN_W-bodyRadius);
         pos.y = clampf(pos.y, 120.f+bodyRadius, SCREEN_H-bodyRadius);
     }
 
-    // Draw HP bar
-    void drawHPBar(sf::RenderWindow& win, float barW=80.f, float yOff=-999.f) const {
+    void drawHPBar(sf::RenderWindow& win, float barW=80.f, float yOff=-999.f) const 
+    {
         if(yOff <= -998.f) yOff = -bodyRadius - 14.f;
         float ratio  = getHPRatio();
         float bx     = pos.x - barW/2.f;
