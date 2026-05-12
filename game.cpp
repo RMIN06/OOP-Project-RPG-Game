@@ -374,6 +374,7 @@ protected:
     float        currentHP;
     sf::Vector2f pos;
     float        bodyRadius;
+    float  iframeTimer;
     bool         dead;
     float        hitFlash;   // seconds to flash white on hit
     const sf::Texture* spriteTexture;
@@ -381,7 +382,7 @@ protected:
 public:
     Avatar(const std::string& n, float spd, float hp, sf::Vector2f startPos, float r, const sf::Texture* tex = nullptr)
         : name(n), baseSpeed(spd), maxHP(hp), currentHP(hp),
-          pos(startPos), bodyRadius(r), dead(false), hitFlash(0.f), spriteTexture(tex) {}
+          pos(startPos), bodyRadius(r), dead(false), hitFlash(0.f), iframeTimer(0.f), spriteTexture(tex) {}
     const sf::Texture* getTexture() const { return spriteTexture; }
     virtual ~Avatar(){}
 
@@ -392,10 +393,13 @@ public:
 
     // Common
     virtual void takeDamage(float dmg){
-        if(dead) return;
+        if(dead || iframeTimer > 0.f) return;     
         currentHP -= dmg;
         hitFlash   = 0.12f;
-        if(currentHP <= 0.f){ currentHP=0.f; dead=true; }
+        iframeTimer = 0.25f;
+        if(currentHP <= 0.f){ 
+            currentHP=0.f; dead=true; 
+        }
     }
     void healHP(float amt){
         currentHP = clampf(currentHP+amt, 0.f, maxHP);
@@ -428,6 +432,8 @@ public:
         sf::RectangleShape bg({barW, 8.f});
         bg.setPosition(sf::Vector2f(bx, by));
         bg.setFillColor(sf::Color(40,40,40));
+        bg.setOutlineThickness(1.5f);
+        bg.setOutlineColor(sf::Color::Black);
         win.draw(bg);
 
         sf::RectangleShape fill({barW*ratio, 8.f});
@@ -436,7 +442,11 @@ public:
         win.draw(fill);
     }
 
-    void tickFlash(float dt){ if(hitFlash>0.f) hitFlash -= dt; }
+    void tickFlash(float dt)
+    { 
+        if(hitFlash>0.f) hitFlash -= dt; 
+        if(iframeTimer>0.f) iframeTimer -= dt;
+    }
     sf::Color flashTint() const { return hitFlash>0.f ? sf::Color::White : sf::Color(0,0,0,0); }
 };
 
@@ -460,7 +470,7 @@ protected:
 public:
     Hero(const std::string& n, float spd, float hp,
          sf::Vector2f startPos, sf::Color col, const sf::Texture* tex=nullptr)
-        : Avatar(n, spd, hp, startPos, 22.f, tex),
+        : Avatar(n, spd, hp, startPos, 40.f, tex),
           meleeMove(nullptr), rangedMove(nullptr), specialMove(nullptr),
           speedMult(1.f), shielded(false), attackBoost(1.f), speedBoost(1.f),
           powerTimer(0.f), bodyColor(col), animT(0.f) 
@@ -822,7 +832,7 @@ class Villain : public Avatar {
 
 public:
     Villain(const sf::Texture* tex=nullptr)
-        : Avatar("Dr. Vroomstein", 150.f, 1200.f, {SCREEN_W/2.f, 200.f}, 38.f, tex),
+        : Avatar("Dr. Vroomstein", 150.f, 1200.f, {SCREEN_W/2.f, 200.f}, 60.f, tex),
           state(VillainState::IDLE), stateTimer(2.f), moveTimer(0.f),
           targetPos(SCREEN_W/2.f, 200.f), animT(0.f), summonThreshold(3),
           summonsSent(0), shootTimer(0.f), chargeSpeed(0.f),
