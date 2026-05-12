@@ -629,7 +629,7 @@ public:
 class HeroA : public Hero 
 {
 public:
-    HeroA() : Hero("PALADIN", 200.f, 300.f, {200, 400}, Pal::HeroA, &gHeroTextures[0])
+    HeroA() : Hero("IRONMAN", 200.f, 300.f, {200, 400}, Pal::HeroA, &gHeroTextures[0])
     {
         meleeMove   = new MeleeMove("Shield Bash", 35.f, 0.4f, 0.15f);
         rangedMove  = new RangedMove("Holy Bolt",  22.f, 0.6f, false);
@@ -642,7 +642,7 @@ public:
 class HeroB : public Hero 
 {
 public:
-    HeroB() : Hero("RANGER", 270.f, 220.f, {200, 400}, Pal::HeroB, &gHeroTextures[1]) 
+    HeroB() : Hero("THOR", 270.f, 220.f, {200, 400}, Pal::HeroB, &gHeroTextures[1]) 
     {
         meleeMove   = new MeleeMove("Blade Swipe", 28.f, 0.35f, 0.08f);
         rangedMove  = new RangedMove("Pierce Arrow",30.f, 0.5f, true);
@@ -655,7 +655,7 @@ public:
 class HeroC : public Hero 
 {
 public:
-    HeroC() : Hero("MAGE", 170.f, 250.f, {200, 400}, Pal::HeroC, &gHeroTextures[2]) 
+    HeroC() : Hero("DR.STRANGE", 170.f, 250.f, {200, 400}, Pal::HeroC, &gHeroTextures[2]) 
     {
         meleeMove   = new MeleeMove("Staff Strike", 40.f, 0.55f, 0.05f);
         rangedMove  = new RangedMove("Arcane Bolt", 38.f, 0.7f, false);
@@ -1342,9 +1342,9 @@ class GameLoop {
 
         struct HeroInfo{ std::string name, desc1, desc2, desc3; sf::Color col; int key; };
         HeroInfo heroes[3] = {
-            {"PALADIN","HP: 300","Speed: 200","Lifesteal Melee",Pal::HeroA,1},
-            {"RANGER", "HP: 220","Speed: 270","Piercing Arrows",Pal::HeroB,2},
-            {"MAGE",   "HP: 250","Speed: 170","Massive AoE Burst",Pal::HeroC,3},
+            {"IRONMAN","HP: 300","Speed: 200","Lifesteal Melee",Pal::HeroA,1},
+            {"THOR", "HP: 220","Speed: 270","Piercing Arrows",Pal::HeroB,2},
+            {"DR.STRANGE",   "HP: 250","Speed: 170","Massive AoE Burst",Pal::HeroC,3},
         };
 
         for(int i=0;i<3;i++){
