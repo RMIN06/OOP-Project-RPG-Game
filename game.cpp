@@ -228,7 +228,7 @@ public:
 
     virtual void trigger(sf::Vector2f from, sf::Vector2f dir) = 0;
     virtual string getName()  const = 0;
-    virtual float getMult()  const = 0; 
+    virtual float getMult()  const = 0;  // score multiplier
 
     bool isReady() const
     { 
@@ -363,7 +363,9 @@ public:
     }
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
 //  ABSTRACT BASE: Avatar
+// ─────────────────────────────────────────────────────────────────────────────
 class Avatar {
 protected:
     std::string  name;
@@ -374,83 +376,54 @@ protected:
     float        bodyRadius;
     float  iframeTimer;
     bool         dead;
-    float        hitFlash;
+    float        hitFlash;   // seconds to flash white on hit
     const sf::Texture* spriteTexture;
 
 public:
     Avatar(const std::string& n, float spd, float hp, sf::Vector2f startPos, float r, const sf::Texture* tex = nullptr)
         : name(n), baseSpeed(spd), maxHP(hp), currentHP(hp),
           pos(startPos), bodyRadius(r), dead(false), hitFlash(0.f), iframeTimer(0.f), spriteTexture(tex) {}
-    const sf::Texture* getTexture() const
-     {
-         return spriteTexture;
- }
-    virtual ~Avatar()
-    {
+    const sf::Texture* getTexture() const { return spriteTexture; }
+    virtual ~Avatar(){}
 
-    }
-
+    // Pure virtuals
     virtual void move(float dt, sf::Vector2f input) = 0;
     virtual void attack(sf::Vector2f dir)            = 0;
     virtual void render(sf::RenderWindow& win)       = 0;
 
+    // Common
     virtual void takeDamage(float dmg){
         if(dead || iframeTimer > 0.f) return;     
         currentHP -= dmg;
         hitFlash   = 0.12f;
         iframeTimer = 0.25f;
-
-    pushFlash("-" + to_string((int)dmg), sf::Color(255, 80, 80), sf::Vector2f(pos.x, pos.y - bodyRadius));   
-         if(currentHP <= 0.f){ 
+        if(currentHP <= 0.f){ 
             currentHP=0.f; dead=true; 
         }
     }
-    void healHP(float amt)
-    {
+    void healHP(float amt){
         currentHP = clampf(currentHP+amt, 0.f, maxHP);
     }
-    bool  isDead() const
-     { 
-        return dead; 
-    }
-    float getHP() const 
-    { 
-        return currentHP; 
-    }
-    float getMaxHP() const
-    {
-         return maxHP;
-   }
-    float getHPRatio() const
-     { 
-        return currentHP/maxHP;
-     }
-    sf::Vector2f getPos()const
-     { 
-        return pos; 
-    }
-    float getRadius() const 
-    {
-         return bodyRadius;
- }
-    std::string getName()const 
-    { 
-        return name;
-     }
+    bool  isDead()       const { return dead; }
+    float getHP()        const { return currentHP; }
+    float getMaxHP()     const { return maxHP; }
+    float getHPRatio()   const { return currentHP/maxHP; }
+    sf::Vector2f getPos()const { return pos; }
+    float getRadius()    const { return bodyRadius; }
+    std::string getName()const { return name; }
 
-    sf::FloatRect bounds() const
-    {
+    sf::FloatRect bounds() const {
         return sf::FloatRect(sf::Vector2f(pos.x-bodyRadius, pos.y-bodyRadius), sf::Vector2f(bodyRadius*2, bodyRadius*2));
     }
 
-    void clampToScreen()
-    {
+    // Bounds clamp — clamp to screen
+    void clampToScreen(){
         pos.x = clampf(pos.x, bodyRadius, SCREEN_W-bodyRadius);
         pos.y = clampf(pos.y, 120.f+bodyRadius, SCREEN_H-bodyRadius);
     }
 
-    void drawHPBar(sf::RenderWindow& win, float barW=80.f, float yOff=-999.f) const 
-    {
+    // Draw HP bar
+    void drawHPBar(sf::RenderWindow& win, float barW=80.f, float yOff=-999.f) const {
         if(yOff <= -998.f) yOff = -bodyRadius - 14.f;
         float ratio  = getHPRatio();
         float bx     = pos.x - barW/2.f;
@@ -864,25 +837,29 @@ class Villain : public Avatar {
 
 public:
     Villain(const sf::Texture* tex=nullptr)
-        : Avatar("Dr. Vroomstein", 150.f, 1200.f, {SCREEN_W/2.f, 200.f}, 60.f, tex),
+        : Avatar("Dr. Vroomstein", 175.f, 1300.f, {SCREEN_W/2.f, 200.f}, 55.f, tex),
           state(VillainState::IDLE), stateTimer(2.f), moveTimer(0.f),
           targetPos(SCREEN_W/2.f, 200.f), animT(0.f), summonThreshold(3),
           summonsSent(0), shootTimer(0.f), chargeSpeed(0.f),
           chargeDir(0,0), charging(false), eyeT(0.f) {}
 
-    void setSummonCallback(std::function<void()> cb){ onSummon = cb; }
+    void setSummonCallback(function<void()> cb){ onSummon = cb; }
 
     void attack(sf::Vector2f dir) override {
         // Shoot at hero
+        
         sf::Vector2f vel = normalize(dir)*320.f;
         spawnProjectile(pos, vel, 18.f, false, false, 12.f, Pal::EnemyProj);
+        
         // Extra spread
-        float angle = std::atan2(dir.y,dir.x);
+       
+        float angle = atan2(dir.y,dir.x);
         float spread = 0.35f;
-        sf::Vector2f v2(std::cos(angle+spread)*300.f, std::sin(angle+spread)*300.f);
-        sf::Vector2f v3(std::cos(angle-spread)*300.f, std::sin(angle-spread)*300.f);
-        spawnProjectile(pos, v2, 14.f, false, false, 10.f, Pal::EnemyProj);
-        spawnProjectile(pos, v3, 14.f, false, false, 10.f, Pal::EnemyProj);
+        sf::Vector2f v2(cos(angle+spread)*300.f,sin(angle+spread)*300.f);
+        sf::Vector2f v3(cos(angle-spread)*300.f,sin(angle-spread)*300.f);
+        spawnProjectile(pos, v2, 15.f, false, false, 10.f, Pal::EnemyProj);
+        spawnProjectile(pos, v3, 15.f, false, false, 10.f, Pal::EnemyProj);
+    
     }
 
     void move(float dt, sf::Vector2f heroPos) override {
@@ -891,20 +868,37 @@ public:
         tickFlash(dt);
 
         // Check HP thresholds for summons
+       
         float ratio = getHPRatio();
         int shouldHaveSummoned = 0;
-        if(ratio < 0.75f) shouldHaveSummoned = 1;
-        if(ratio < 0.50f) shouldHaveSummoned = 2;
-        if(ratio < 0.25f) shouldHaveSummoned = 3;
-        if(summonsSent < shouldHaveSummoned){
+        if(ratio < 0.65f) 
+       {
+        shouldHaveSummoned = 1;
+       } 
+        if(ratio < 0.30f) 
+        {
+            shouldHaveSummoned = 2;
+        }
+
+        if(ratio < 0.15f) 
+        {
+            shouldHaveSummoned = 3;
+        }
+        if(summonsSent < shouldHaveSummoned)
+        {
             summonsSent++;
-            if(onSummon){ onSummon(); pushFlash("MINIONS SUMMONED!", Pal::MinionV); }
+            if(onSummon)
+            { 
+                onSummon(); pushFlash("MINIONS SUMMONED!", Pal::MinionV); 
+            }
         }
 
         stateTimer -= dt;
 
-        switch(state){
-        case VillainState::IDLE: {
+        switch(state)
+        {
+        case VillainState::IDLE: 
+        {
             // Float around upper zone
             moveTimer -= dt;
             if(moveTimer <= 0.f){
@@ -914,16 +908,21 @@ public:
             sf::Vector2f dir = normalize(targetPos - pos);
             pos += dir * baseSpeed * 0.5f * dt;
 
-            if(stateTimer <= 0.f){
+            if(stateTimer <= 0.f)
+            {
                 int choice = rand()%3;
-                if(choice==0){ state=VillainState::SHOOT; stateTimer=2.0f; shootTimer=0.f; }
-                else if(choice==1){ state=VillainState::CHARGE; stateTimer=1.2f;
+                if(choice==0)
+                { state=VillainState::SHOOT; stateTimer=2.0f; shootTimer=0.f; }
+                else if(choice==1)
+                { state=VillainState::CHARGE; stateTimer=1.2f;
                     chargeDir = normalize(heroPos - pos); chargeSpeed=0.f; charging=false; }
-                else { state=VillainState::COOLDOWN; stateTimer=1.5f; }
+                else 
+                { state=VillainState::COOLDOWN; stateTimer=1.5f; }
             }
             break;
         }
-        case VillainState::SHOOT: {
+        case VillainState::SHOOT: 
+        {
             shootTimer -= dt;
             if(shootTimer <= 0.f){
                 attack(normalize(heroPos - pos));
@@ -932,7 +931,8 @@ public:
             if(stateTimer <= 0.f){ state=VillainState::COOLDOWN; stateTimer=1.2f; }
             break;
         }
-        case VillainState::CHARGE: {
+        case VillainState::CHARGE: 
+        {
             if(!charging){
                 // Wind up
                 if(stateTimer <= 0.3f){
@@ -948,14 +948,16 @@ public:
             break;
         }
         case VillainState::SUMMON:
-        case VillainState::COOLDOWN: {
+        case VillainState::COOLDOWN: 
+        {
             if(stateTimer <= 0.f){ state=VillainState::IDLE; stateTimer=randf(1.5f,3.f); }
             break;
         }
         }
     }
 
-    void render(sf::RenderWindow& win) override {
+    void render(sf::RenderWindow& win) override 
+    {
         const sf::Texture* tex = getTexture();
         float r = bodyRadius;
         if(tex){
@@ -988,7 +990,8 @@ public:
         }
 
         // Rotating gear teeth (rectangles around body)
-        for(int i=0;i<8;i++){
+        for(int i=0;i<8;i++)
+        {
             float a = animT*1.2f + (PI*2.f/8.f)*i;
             float tx = pos.x + (r+14.f)*std::cos(a);
             float ty = pos.y + (r+14.f)*std::sin(a);
@@ -1237,38 +1240,32 @@ void drawPowerUps(sf::RenderWindow& win, std::vector<PowerUp>& pups, float dt){
 // ─────────────────────────────────────────────────────────────────────────────
 class GameLoop {
     sf::RenderWindow& win;
-    sf::Font& font;
-    HUD hud;
+    sf::Font&         font;
+    HUD               hud;
 
-    GameState state;
-    int selectedHero;
-    int stage;
-    float waveTimer;
-    float powerUpTimer;
-    float gameTime;
-    sf::Music bgMusic;
+    GameState   state;
+    int         selectedHero;
+    int         stage;
+    float       waveTimer;
+    float       powerUpTimer;
+    float       gameTime;
+    sf::Music   bgMusic;
     std::string currentMusicPath;
 
-    Hero* hero;
-    Villain* villain;
-    vector<Minion*> minions;
+    Hero*              hero;
+    Villain*           villain;
+    std::vector<Minion*> minions;
 
-    sf::Vector2f  aimDir; 
+    sf::Vector2f  aimDir;   // last known aim direction (toward mouse or auto)
 
-    void clearMinions()
-    {
+    void clearMinions(){
         for(auto* m : minions) delete m;
         minions.clear();
     }
 
-    void playMusic(const string& path)
-    {
-        if(currentMusicPath == path && bgMusic.getStatus() == sf::SoundSource::Status::Playing)
-        {
-            return;
-        }
-        if(bgMusic.openFromFile(path))
-        {
+    void playMusic(const std::string& path){
+        if(currentMusicPath == path && bgMusic.getStatus() == sf::SoundSource::Status::Playing) return;
+        if(bgMusic.openFromFile(path)){
             bgMusic.setLooping(true);
             bgMusic.play();
             currentMusicPath = path;
@@ -1278,137 +1275,60 @@ class GameLoop {
     void spawnWave(int stageNum){
         clearMinions();
         int count = 4 + stageNum*2;
-        if(stageNum == 1)
-        {
-            count = 5;
-        } 
-        else if(stageNum == 2)
-        {
-            count = 8;
-        }
-         
-        else if(stageNum == 3) 
-        {
-            count = 5;
-        }
+        if(stageNum == 1) count = 5;
+        else if(stageNum == 2) count = 8;
+        else if(stageNum == 3) count = 5;
 
-        for(int i=0;i<count;i++)
-        {
+        for(int i=0;i<count;i++){
             // Spawn from random screen edge
             sf::Vector2f spawnPos;
             int edge = rand()%4;
-            if(edge==0) 
-            {
-                spawnPos = {randf(0,SCREEN_W), 90.f};
-
-            }
-            else if(edge==1)
-            {
-                spawnPos = {(float)SCREEN_W-20.f, randf(120,SCREEN_H)};
-            } 
-            else if(edge==2)
-            {
-                spawnPos = {randf(0,SCREEN_W), (float)SCREEN_H-20.f};
-            } 
-            else
-            {
-                spawnPos = {20.f, randf(120,SCREEN_H)};
-            }  
+            if(edge==0) spawnPos = {randf(0,SCREEN_W), 90.f};
+            else if(edge==1) spawnPos = {(float)SCREEN_W-20.f, randf(120,SCREEN_H)};
+            else if(edge==2) spawnPos = {randf(0,SCREEN_W), (float)SCREEN_H-20.f};
+            else  spawnPos = {20.f, randf(120,SCREEN_H)};
 
             sf::Vector2f fOff = {randf(-80,80), randf(-60,60)};
             int type = i % 3;
-            if(type==0)
-            {
-                 minions.push_back(new MinionV(spawnPos, fOff, &gMinionTexture));
-            }     
-            else if(type==1)
-            {
-                minions.push_back(new MinionW(spawnPos, fOff, &gMinionTexture));
-            } 
-            else
-            {
-                minions.push_back(new MinionL(spawnPos, fOff, &gMinionTexture));
-            }
-
+            if(type==0)      minions.push_back(new MinionV(spawnPos, fOff, &gMinionTexture));
+            else if(type==1) minions.push_back(new MinionW(spawnPos, fOff, &gMinionTexture));
+            else             minions.push_back(new MinionL(spawnPos, fOff, &gMinionTexture));
         }
-
         std::ostringstream ss;
         ss<<"STAGE "<<stageNum<<" — "<<count<<" MINIONS!";
         pushFlash(ss.str(), Pal::Gold);
     }
 
-    void setupStage(int stageNum)
-    {
+    void setupStage(int stageNum){
         if(stageNum < 3){
-            if(villain)
-            { 
-                delete villain; villain = nullptr; 
-            }
-        } 
-
-        else 
-        {
+            if(villain){ delete villain; villain = nullptr; }
+        } else {
             setupVillain();
         }
-
         stage = stageNum;
         waveTimer = 5.f;
         spawnWave(stageNum);
         std::ostringstream ss;
         ss<<"STAGE "<<stageNum;
         pushFlash(ss.str(), Pal::Gold);
-
-        if(stageNum == 3)
-        {
-            pushFlash("DR. VROOMSTEIN ENTERS!", Pal::Villain);
-        } 
-        if(stageNum == 1)
-        {
-            playMusic("Juhani Junkala [Retro Game Music Pack] Level 1.wav");
-        } 
-        else if(stageNum == 2)
-        {
-            playMusic("Juhani Junkala [Retro Game Music Pack] Level 2.wav");
-        } 
-        else if(stageNum == 3)
-        {
-            playMusic("Juhani Junkala [Retro Game Music Pack] Level 3.wav");
-        } 
+        if(stageNum == 3) pushFlash("DR. VROOMSTEIN ENTERS!", Pal::Villain);
+        if(stageNum == 1) playMusic("Juhani Junkala [Retro Game Music Pack] Level 1.wav");
+        else if(stageNum == 2) playMusic("Juhani Junkala [Retro Game Music Pack] Level 2.wav");
+        else if(stageNum == 3) playMusic("Juhani Junkala [Retro Game Music Pack] Level 3.wav");
     }
 
-    void setupVillain()
-    {
+    void setupVillain(){
         if(villain) delete villain;
         villain = new Villain(&gVroomsteinTexture);
         villain->setSummonCallback([this]{ spawnWave(stage); });
     }
 
-    void createHero(int sel)
-    {
-        if(hero)
-        {
-            delete hero;
-        } 
-
-        switch(sel)
-        {
-        case 0:
-        {
-            hero = new HeroA();
-            break;
-        }
-       
-        case 1: 
-        {
-            hero = new HeroB();
-            break;
-        }
-        default: 
-        {
-            hero = new HeroC();
-            break;
-        }
-
+    void createHero(int sel){
+        if(hero) delete hero;
+        switch(sel){
+        case 0: hero = new HeroA(); break;
+        case 1: hero = new HeroB(); break;
+        default: hero = new HeroC(); break;
         }
         gScore.total=0; gScore.streak=0; gScore.streakMult=1.f;
         gProjectiles.clear();
@@ -1421,8 +1341,7 @@ class GameLoop {
     }
 
     // ── Menu screens ─────────────────────────────────────────────────────────
-    void drawMenu(float t)
-    {
+    void drawMenu(float t){
         drawBackground(win,t);
 
         // Title
@@ -1820,22 +1739,20 @@ public:
     }
 };
 
-
-
-
-
-
-
-
-
-
+// ─────────────────────────────────────────────────────────────────────────────
+//  ENTRY POINT
+// ─────────────────────────────────────────────────────────────────────────────
 int main(){
     srand((unsigned)time(nullptr));
 
-    sf::RenderWindow window(sf::VideoMode(sf::Vector2u{SCREEN_W, SCREEN_H}), "VroomsteinRPG — OOP Semester Project — BSCS 2E", sf::Style::Close | sf::Style::Titlebar);
+    sf::RenderWindow window(
+        sf::VideoMode(sf::Vector2u{SCREEN_W, SCREEN_H}),
+        "VroomsteinRPG — OOP Semester Project — BSCS 2E",
+        sf::Style::Close | sf::Style::Titlebar
+    );
     window.setFramerateLimit(60);
 
-
+    // Load font — try common system fonts, fallback to default
     sf::Font font;
     bool fontLoaded = false;
     const char* fontPaths[] = {
@@ -1847,42 +1764,22 @@ int main(){
         "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
         "/System/Library/Fonts/Menlo.ttc",
     };
-    for(auto* path : fontPaths)
-    {
-        if(font.openFromFile(path))
-        { 
-            fontLoaded=true; break; 
-        }
+    for(auto* path : fontPaths){
+        if(font.openFromFile(path)){ fontLoaded=true; break; }
     }
-
-    if(!fontLoaded)
-    {
+    if(!fontLoaded){
         std::cerr<<"[WARN] Could not load any system font. Text may not render.\n";
         std::cerr<<"       Place a .ttf file named 'font.ttf' next to the exe and recompile,\n";
         std::cerr<<"       or install DejaVu fonts (Linux: sudo apt install fonts-dejavu)\n";
+        // Try local fallback
         (void)font.openFromFile("font.ttf");
     }
 
-    if(!gHeroTextures[0].loadFromFile("hero1.png"))
-    {
-        cerr<<"[WARN] hero1.png not found\n";
-    } 
-    if(!gHeroTextures[1].loadFromFile("hero2.png"))
-    {
-        cerr<<"[WARN] hero2.png not found\n";
-    } 
-    if(!gHeroTextures[2].loadFromFile("hero3.png"))
-    {
-        cerr<<"[WARN] hero3.png not found\n";
-    } 
-    if(!gMinionTexture.loadFromFile("minions.png"))
-    {
-        cerr<<"[WARN] minions.png not found\n";
-    } 
-    if(!gVroomsteinTexture.loadFromFile("vroomstein.png"))
-    {
-        cerr<<"[WARN] vroomstein.png not found\n";
-    }
+    if(!gHeroTextures[0].loadFromFile("hero1.png")) std::cerr<<"[WARN] hero1.png not found\n";
+    if(!gHeroTextures[1].loadFromFile("hero2.png")) std::cerr<<"[WARN] hero2.png not found\n";
+    if(!gHeroTextures[2].loadFromFile("hero3.png")) std::cerr<<"[WARN] hero3.png not found\n";
+    if(!gMinionTexture.loadFromFile("minions.png")) std::cerr<<"[WARN] minions.png not found\n";
+    if(!gVroomsteinTexture.loadFromFile("vroomstein.png")) std::cerr<<"[WARN] vroomstein.png not found\n";
 
     GameLoop game(window, font);
     game.run();
@@ -1890,7 +1787,40 @@ int main(){
     return 0;
 }
 
-/*=============================================================================
+/*
+=============================================================================
+  COMPILATION QUICK REFERENCE
+=============================================================================
+
+  WINDOWS (in VS Code terminal, MinGW-w64):
+  ------------------------------------------
+  Compile:
+    g++ -o VroomsteinRPG VroomsteinRPG.cpp ^
+        -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system ^
+        -std=c++17 -O2
+
+  If SFML is in a custom path (e.g. C:\SFML-2.6.2\):
+    g++ -o VroomsteinRPG VroomsteinRPG.cpp ^
+        -I"C:\SFML-2.6.2\include" ^
+        -L"C:\SFML-2.6.2\lib" ^
+        -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system ^
+        -std=c++17 -O2
+
+  Then copy SFML DLLs next to the .exe:
+    C:\SFML-2.6.2\bin\*.dll  ->  same folder as VroomsteinRPG.exe
+
+  Run:
+    .\VroomsteinRPG.exe
+
+  LINUX:
+  -------
+    sudo apt install libsfml-dev    (if not installed)
+    g++ -o VroomsteinRPG VroomsteinRPG.cpp \
+        -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system \
+        -std=c++17 -O2
+    ./VroomsteinRPG
+
+=============================================================================
   OOP REQUIREMENTS MET:
     Abstract base Avatar  -> pure virtual move(), attack(), render()
     Abstract base Move    -> pure virtual trigger(), getName(), getMult()
