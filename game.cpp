@@ -413,7 +413,8 @@ public:
 // ─────────────────────────────────────────────────────────────────────────────
 //  HERO BASE (still abstract — subclasses implement render)
 // ─────────────────────────────────────────────────────────────────────────────
-class Hero : public Avatar {
+class Hero : public Avatar 
+{
 protected:
     MeleeMove*  meleeMove;
     RangedMove* rangedMove;
@@ -432,13 +433,16 @@ public:
         : Avatar(n, spd, hp, startPos, 22.f, tex),
           meleeMove(nullptr), rangedMove(nullptr), specialMove(nullptr),
           speedMult(1.f), shielded(false), attackBoost(1.f), speedBoost(1.f),
-          powerTimer(0.f), bodyColor(col), animT(0.f) {}
+          powerTimer(0.f), bodyColor(col), animT(0.f) 
+        {}
 
-    ~Hero(){
+    ~Hero()
+    {
         delete meleeMove; delete rangedMove; delete specialMove;
     }
 
-    void move(float dt, sf::Vector2f input) override {
+    void move(float dt, sf::Vector2f input) override 
+    {
         float spd = baseSpeed * speedMult * speedBoost;
         float len = length(input);
         if(len > 0.f) input = normalize(input);
@@ -447,23 +451,31 @@ public:
         animT += dt * 4.f;
     }
 
-    void attack(sf::Vector2f dir) override { (void)dir; /* handled per-key */ }
+    void attack(sf::Vector2f dir) override 
+    { 
+        (void)dir; /* handled per-key */ 
+    }
 
-    void doMelee(sf::Vector2f dir){
+    void doMelee(sf::Vector2f dir)
+    {
         if(meleeMove && meleeMove->isReady())
             meleeMove->trigger(pos, dir);
     }
-    void doRanged(sf::Vector2f dir){
+    void doRanged(sf::Vector2f dir)
+    {
         if(rangedMove && rangedMove->isReady())
             rangedMove->trigger(pos, dir);
     }
-    void doSpecial(){
+    void doSpecial()
+    {
         if(specialMove && specialMove->isReady())
             specialMove->trigger(pos, {1,0});
     }
 
-    void applyPowerUp(PowerKind k){
-        switch(k){
+    void applyPowerUp(PowerKind k)
+    {
+        switch(k)
+        {
         case PowerKind::Shield:
             shielded=true; powerTimer=8.f;
             pushFlash("SHIELD ACTIVATED!", Pal::Shield, pos);
@@ -479,16 +491,25 @@ public:
         }
     }
 
-    void takeDamage(float dmg) override {
-        if(shielded){ shielded=false; pushFlash("SHIELD BLOCKED!", Pal::Shield, pos); return; }
+    void takeDamage(float dmg) override 
+    {
+        if(shielded)
+        { 
+            shielded=false; 
+            pushFlash("SHIELD BLOCKED!", Pal::Shield, pos);
+             return; 
+        }
         gScore.resetStreak();
         Avatar::takeDamage(dmg);
     }
 
-    void tickPowers(float dt){
-        if(powerTimer > 0.f){
+    void tickPowers(float dt)
+    {
+        if(powerTimer > 0.f)
+        {
             powerTimer -= dt;
-            if(powerTimer <= 0.f){
+            if(powerTimer <= 0.f)
+            {
                 shielded=false; attackBoost=1.f; speedBoost=1.f; powerTimer=0.f;
             }
         }
@@ -501,9 +522,11 @@ public:
     Move* getRangedMove()  const { return rangedMove; }
     Move* getSpecialMove() const { return specialMove; }
 
-    void render(sf::RenderWindow& win) override {
+    void render(sf::RenderWindow& win) override 
+    {
         const sf::Texture* tex = getTexture();
-        if(tex){
+        if(tex)
+        {
             sf::Sprite sprite(*tex);
             sprite.setOrigin(sf::Vector2f(tex->getSize().x/2.f, tex->getSize().y/2.f));
             float scale = (bodyRadius*2.f) / std::max(tex->getSize().x, tex->getSize().y);
@@ -511,7 +534,8 @@ public:
             sprite.setPosition(pos);
             if(hitFlash > 0.f) sprite.setColor(sf::Color::White);
             win.draw(sprite);
-        } else {
+        } else
+        {
             // Body
             sf::CircleShape body(bodyRadius);
             body.setOrigin(sf::Vector2f(bodyRadius, bodyRadius));
@@ -546,7 +570,8 @@ public:
         }
 
         // Shield ring
-        if(shielded){
+        if(shielded)
+        {
             sf::CircleShape ring(bodyRadius+6.f);
             ring.setOrigin(sf::Vector2f(bodyRadius+6.f,bodyRadius+6.f));
             ring.setPosition(pos);
@@ -561,10 +586,11 @@ public:
 };
 
 // ─── HeroA: The Paladin (blue, high HP, lifesteal melee) ─────────────────────
-class HeroA : public Hero {
+class HeroA : public Hero 
+{
 public:
     HeroA() : Hero("PALADIN", 200.f, 300.f, {200, 400}, Pal::HeroA, &gHeroTextures[0])
-     {
+    {
         meleeMove   = new MeleeMove("Shield Bash", 35.f, 0.4f, 0.15f);
         rangedMove  = new RangedMove("Holy Bolt",  22.f, 0.6f, false);
         specialMove = new SpecialMove("Radiant Nova",50.f,3.5f,180.f);
@@ -573,9 +599,11 @@ public:
 };
 
 // ─── HeroB: The Ranger (green, fast, piercing arrows) ────────────────────────
-class HeroB : public Hero {
+class HeroB : public Hero 
+{
 public:
-    HeroB() : Hero("RANGER", 270.f, 220.f, {200, 400}, Pal::HeroB, &gHeroTextures[1]) {
+    HeroB() : Hero("RANGER", 270.f, 220.f, {200, 400}, Pal::HeroB, &gHeroTextures[1]) 
+    {
         meleeMove   = new MeleeMove("Blade Swipe", 28.f, 0.35f, 0.08f);
         rangedMove  = new RangedMove("Pierce Arrow",30.f, 0.5f, true);
         specialMove = new SpecialMove("Storm Burst", 45.f, 4.0f, 160.f);
@@ -584,9 +612,11 @@ public:
 };
 
 // ─── HeroC: The Mage (yellow, slow, massive special) ─────────────────────────
-class HeroC : public Hero {
+class HeroC : public Hero 
+{
 public:
-    HeroC() : Hero("MAGE", 170.f, 250.f, {200, 400}, Pal::HeroC, &gHeroTextures[2]) {
+    HeroC() : Hero("MAGE", 170.f, 250.f, {200, 400}, Pal::HeroC, &gHeroTextures[2]) 
+    {
         meleeMove   = new MeleeMove("Staff Strike", 40.f, 0.55f, 0.05f);
         rangedMove  = new RangedMove("Arcane Bolt", 38.f, 0.7f, false);
         specialMove = new SpecialMove("Arcane Bomb", 70.f, 5.0f, 220.f);
