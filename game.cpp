@@ -1,17 +1,9 @@
 /*
 =============================================================================
-  VroomsteinRPG.cpp
-  OOP Semester 2 Project — BSCS 2E — NUST Faisalabad
+
+  OOP Semester 2 Project — BSCS 2E 
   Single-file SFML game: All graphics procedurally drawn (no assets needed)
 =============================================================================
-
-  HOW TO COMPILE & RUN (VS Code terminal):
-  -----------------------------------------
-  Windows (MinGW-w64):
-    g++ -o VroomsteinRPG VroomsteinRPG.cpp -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system -std=c++17
-    .\VroomsteinRPG.exe
-
-  Make sure SFML 2.x is installed and headers/libs are on your path.
 
 =============================================================================
   CONTROLS:
@@ -292,16 +284,19 @@ public:
 class RangedMove : public Move {
     bool piercing;
 public:
-    RangedMove(const std::string& n, float dmg, float cd, bool pierce=false)
-        : Move(n,dmg,cd,400.f), piercing(pierce) {}
+    RangedMove(const std::string& n, float dmg, float cd, bool pierce=false) : Move(n,dmg,cd,400.f), piercing(pierce) {}
 
-    void trigger(sf::Vector2f from, sf::Vector2f dir) override {
+    void trigger(sf::Vector2f from, sf::Vector2f dir) override 
+    {
         if(!isReady()) return;
         sf::Vector2f vel = normalize(dir)*520.f;
         spawnProjectile(from, vel, damage, true, piercing, 10.f, Pal::Projectile);
         resetClock();
     }
-    std::string getName() const override { return "RANGED"; }
+    string getName() const override 
+    { 
+        return "RANGED"; 
+    }
     float getMult() const override { return 1.2f; }
 };
 
@@ -418,7 +413,8 @@ if(dead || iframeTimer > 0.f) return;
 // ─────────────────────────────────────────────────────────────────────────────
 //  HERO BASE (still abstract — subclasses implement render)
 // ─────────────────────────────────────────────────────────────────────────────
-class Hero : public Avatar {
+class Hero : public Avatar 
+{
 protected:
     MeleeMove*  meleeMove;
     RangedMove* rangedMove;
@@ -437,13 +433,16 @@ public:
         : Avatar(n, spd, hp, startPos, 22.f, tex),
           meleeMove(nullptr), rangedMove(nullptr), specialMove(nullptr),
           speedMult(1.f), shielded(false), attackBoost(1.f), speedBoost(1.f),
-          powerTimer(0.f), bodyColor(col), animT(0.f) {}
+          powerTimer(0.f), bodyColor(col), animT(0.f) 
+        {}
 
-    ~Hero(){
+    ~Hero()
+    {
         delete meleeMove; delete rangedMove; delete specialMove;
     }
 
-    void move(float dt, sf::Vector2f input) override {
+    void move(float dt, sf::Vector2f input) override 
+    {
         float spd = baseSpeed * speedMult * speedBoost;
         float len = length(input);
         if(len > 0.f) input = normalize(input);
@@ -452,23 +451,31 @@ public:
         animT += dt * 4.f;
     }
 
-    void attack(sf::Vector2f dir) override { (void)dir; /* handled per-key */ }
+    void attack(sf::Vector2f dir) override 
+    { 
+        (void)dir; /* handled per-key */ 
+    }
 
-    void doMelee(sf::Vector2f dir){
+    void doMelee(sf::Vector2f dir)
+    {
         if(meleeMove && meleeMove->isReady())
             meleeMove->trigger(pos, dir);
     }
-    void doRanged(sf::Vector2f dir){
+    void doRanged(sf::Vector2f dir)
+    {
         if(rangedMove && rangedMove->isReady())
             rangedMove->trigger(pos, dir);
     }
-    void doSpecial(){
+    void doSpecial()
+    {
         if(specialMove && specialMove->isReady())
             specialMove->trigger(pos, {1,0});
     }
 
-    void applyPowerUp(PowerKind k){
-        switch(k){
+    void applyPowerUp(PowerKind k)
+    {
+        switch(k)
+        {
         case PowerKind::Shield:
             shielded=true; powerTimer=8.f;
             pushFlash("SHIELD ACTIVATED!", Pal::Shield, pos);
@@ -484,16 +491,25 @@ public:
         }
     }
 
-    void takeDamage(float dmg) override {
-        if(shielded){ shielded=false; pushFlash("SHIELD BLOCKED!", Pal::Shield, pos); return; }
+    void takeDamage(float dmg) override 
+    {
+        if(shielded)
+        { 
+            shielded=false; 
+            pushFlash("SHIELD BLOCKED!", Pal::Shield, pos);
+             return; 
+        }
         gScore.resetStreak();
         Avatar::takeDamage(dmg);
     }
 
-    void tickPowers(float dt){
-        if(powerTimer > 0.f){
+    void tickPowers(float dt)
+    {
+        if(powerTimer > 0.f)
+        {
             powerTimer -= dt;
-            if(powerTimer <= 0.f){
+            if(powerTimer <= 0.f)
+            {
                 shielded=false; attackBoost=1.f; speedBoost=1.f; powerTimer=0.f;
             }
         }
@@ -506,9 +522,11 @@ public:
     Move* getRangedMove()  const { return rangedMove; }
     Move* getSpecialMove() const { return specialMove; }
 
-    void render(sf::RenderWindow& win) override {
+    void render(sf::RenderWindow& win) override 
+    {
         const sf::Texture* tex = getTexture();
-        if(tex){
+        if(tex)
+        {
             sf::Sprite sprite(*tex);
             sprite.setOrigin(sf::Vector2f(tex->getSize().x/2.f, tex->getSize().y/2.f));
             float scale = (bodyRadius*2.f) / std::max(tex->getSize().x, tex->getSize().y);
@@ -516,7 +534,8 @@ public:
             sprite.setPosition(pos);
             if(hitFlash > 0.f) sprite.setColor(sf::Color::White);
             win.draw(sprite);
-        } else {
+        } else
+        {
             // Body
             sf::CircleShape body(bodyRadius);
             body.setOrigin(sf::Vector2f(bodyRadius, bodyRadius));
@@ -551,7 +570,8 @@ public:
         }
 
         // Shield ring
-        if(shielded){
+        if(shielded)
+        {
             sf::CircleShape ring(bodyRadius+6.f);
             ring.setOrigin(sf::Vector2f(bodyRadius+6.f,bodyRadius+6.f));
             ring.setPosition(pos);
@@ -566,10 +586,11 @@ public:
 };
 
 // ─── HeroA: The Paladin (blue, high HP, lifesteal melee) ─────────────────────
-class HeroA : public Hero {
+class HeroA : public Hero 
+{
 public:
     HeroA() : Hero("PALADIN", 200.f, 300.f, {200, 400}, Pal::HeroA, &gHeroTextures[0])
-     {
+    {
         meleeMove   = new MeleeMove("Shield Bash", 35.f, 0.4f, 0.15f);
         rangedMove  = new RangedMove("Holy Bolt",  22.f, 0.6f, false);
         specialMove = new SpecialMove("Radiant Nova",50.f,3.5f,180.f);
@@ -578,9 +599,11 @@ public:
 };
 
 // ─── HeroB: The Ranger (green, fast, piercing arrows) ────────────────────────
-class HeroB : public Hero {
+class HeroB : public Hero 
+{
 public:
-    HeroB() : Hero("RANGER", 270.f, 220.f, {200, 400}, Pal::HeroB, &gHeroTextures[1]) {
+    HeroB() : Hero("RANGER", 270.f, 220.f, {200, 400}, Pal::HeroB, &gHeroTextures[1]) 
+    {
         meleeMove   = new MeleeMove("Blade Swipe", 28.f, 0.35f, 0.08f);
         rangedMove  = new RangedMove("Pierce Arrow",30.f, 0.5f, true);
         specialMove = new SpecialMove("Storm Burst", 45.f, 4.0f, 160.f);
@@ -589,9 +612,11 @@ public:
 };
 
 // ─── HeroC: The Mage (yellow, slow, massive special) ─────────────────────────
-class HeroC : public Hero {
+class HeroC : public Hero 
+{
 public:
-    HeroC() : Hero("MAGE", 170.f, 250.f, {200, 400}, Pal::HeroC, &gHeroTextures[2]) {
+    HeroC() : Hero("MAGE", 170.f, 250.f, {200, 400}, Pal::HeroC, &gHeroTextures[2]) 
+    {
         meleeMove   = new MeleeMove("Staff Strike", 40.f, 0.55f, 0.05f);
         rangedMove  = new RangedMove("Arcane Bolt", 38.f, 0.7f, false);
         specialMove = new SpecialMove("Arcane Bomb", 70.f, 5.0f, 220.f);
@@ -619,7 +644,10 @@ public:
           contactDamage(cd), contactTimer(0.f), bodyColor(c),
           formationOffset(fOff), animT(0.f), speed(spd) {}
 
-    void attack(sf::Vector2f /*dir*/) override {}
+    void attack(sf::Vector2f ) override {
+        // this is a function overrided from avatar but the minions donot attack
+    // so we leave it empty.
+    }
 
     bool tryContactDamage(Avatar* target, float dt){
         contactTimer -= dt;
@@ -644,7 +672,7 @@ public:
             if(hitFlash > 0.f) sprite.setColor(sf::Color::White);
             win.draw(sprite);
         } else {
-            // Diamond body
+            // if there is no png of minion then it would draw a simple black circle with two red small circles on top.
             sf::ConvexShape diamond;
             diamond.setPointCount(4);
             float r = bodyRadius;
@@ -667,8 +695,7 @@ public:
             pupil.setPosition(sf::Vector2f(pos.x+1.f, pos.y-2.f));
             win.draw(pupil);
         }
-
-        drawHPBar(win, 50.f);
+        drawHPBar(win,50.f);
     }
 };
 
@@ -682,35 +709,40 @@ public:
           target(640,360), waveT(randf(0,PI*2)) {}
 
     void move(float dt, sf::Vector2f heroPos) override {
+       // this function determines the movement of the monion in any pattern and will achieve polymorphism in the game loop.
         waveT += dt*2.f;
-        // Move toward hero with slight sine weave
         sf::Vector2f desired = heroPos + formationOffset;
+        // normalize function maintains the speed of the minion.
         sf::Vector2f dir     = normalize(desired - pos);
         pos += dir * speed * dt;
-        // Weave perpendicular
         sf::Vector2f perp(-dir.y, dir.x);
+       // the sin function forms the wave pattern of the perpendicular of the position of the player.
         pos += perp * std::sin(waveT)*30.f*dt;
         animT += dt;
+        // clamptoscreen prevents the minion from going out of screen.
         clampToScreen();
     }
 };
 
 // ─── MinionW: Wave sinusoidal path ────────────────────────────────────────────
 class MinionW : public Minion {
-    float waveT;
-    float baseY;
-    float dirX;
+    float track;
+    float verticalpos;
+    float horizontalpos;
 public:
-    MinionW(sf::Vector2f startPos, sf::Vector2f fOffset, const sf::Texture* tex)
+
+// more speed but less HP than vbot, moves in a horizontal wave pattern across the screen, bouncing off edges.  
+
+MinionW(sf::Vector2f startPos, sf::Vector2f fOffset, const sf::Texture* tex)
         : Minion("Wavebot", 140.f, 40.f, startPos, Pal::MinionW, 10.f, fOffset, tex),
-          waveT(randf(0,PI*2)), baseY(startPos.y), dirX(startPos.x>SCREEN_W/2?-1.f:1.f) {}
+          track(randf(0,PI*2)), verticalpos(startPos.y),horizontalpos(startPos.x>SCREEN_W/2?-1.f:1.f) {}
 
     void move(float dt, sf::Vector2f heroPos) override {
-        waveT += dt*3.f;
-        pos.x += dirX * speed * dt;
-        pos.y  = heroPos.y + formationOffset.y + std::sin(waveT)*80.f;
+        track += dt*3.f;
+        pos.x += horizontalpos * speed * dt;
+        pos.y  = heroPos.y + formationOffset.y + std::sin(track)*80.f;
         // When too far, wrap or chase
-        if(pos.x < 50.f || pos.x > SCREEN_W-50.f) dirX *= -1.f;
+        if(pos.x < 50.f || pos.x > SCREEN_W-50.f)  horizontalpos*= -1.f;
         clampToScreen();
         animT += dt;
     }
@@ -721,7 +753,8 @@ class MinionL : public Minion {
     float sweepT;
     float startX;
 public:
-    MinionL(sf::Vector2f startPos, sf::Vector2f fOffset, const sf::Texture* tex)
+// more health less speed and moves in a linear pattern.    
+MinionL(sf::Vector2f startPos, sf::Vector2f fOffset, const sf::Texture* tex)
         : Minion("Linebot", 100.f, 60.f, startPos, Pal::MinionL, 12.f, fOffset, tex),
           sweepT(randf(0,PI*2)), startX(startPos.x) {}
 
@@ -729,7 +762,7 @@ public:
         sweepT += dt*1.5f;
         // Parabolic arc toward hero
         sf::Vector2f desired(heroPos.x + formationOffset.x,
-                             heroPos.y + formationOffset.y + std::cos(sweepT)*60.f);
+        heroPos.y + formationOffset.y + cos(sweepT)*60.f);
         sf::Vector2f dir = normalize(desired - pos);
         pos += dir * speed * dt;
         clampToScreen();
