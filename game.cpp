@@ -394,6 +394,8 @@ if(dead || iframeTimer > 0.f) return;
         sf::RectangleShape bg({barW, 8.f});
         bg.setPosition(sf::Vector2f(bx, by));
         bg.setFillColor(sf::Color(40,40,40));
+        bg.setOutlineThickness(1.5f);
+        bg.setOutlineColor(sf::Color::Black);
         win.draw(bg);
 
         sf::RectangleShape fill({barW*ratio, 8.f});
