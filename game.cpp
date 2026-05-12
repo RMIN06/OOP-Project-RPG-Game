@@ -709,15 +709,17 @@ public:
           target(640,360), waveT(randf(0,PI*2)) {}
 
     void move(float dt, sf::Vector2f heroPos) override {
+       // this function determines the movement of the monion in any pattern and will achieve polymorphism in the game loop.
         waveT += dt*2.f;
-        // Move toward hero with slight sine weave
         sf::Vector2f desired = heroPos + formationOffset;
+        // normalize function maintains the speed of the minion.
         sf::Vector2f dir     = normalize(desired - pos);
         pos += dir * speed * dt;
-        // Weave perpendicular
         sf::Vector2f perp(-dir.y, dir.x);
+       // the sin function forms the wave pattern of the perpendicular of the position of the player.
         pos += perp * std::sin(waveT)*30.f*dt;
         animT += dt;
+        // clamptoscreen prevents the minion from going out of screen.
         clampToScreen();
     }
 };
