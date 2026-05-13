@@ -292,10 +292,10 @@ public:
 class RangedMove : public Move {
     bool piercing;
 public:
-    RangedMove(const std::string& n, float dmg, float cd, bool pierce=false)
-        : Move(n,dmg,cd,400.f), piercing(pierce) {}
+    RangedMove(const std::string& n, float dmg, float cd, bool pierce=false) : Move(n,dmg,cd,400.f), piercing(pierce) {}
 
-    void trigger(sf::Vector2f from, sf::Vector2f dir) override {
+    void trigger(sf::Vector2f from, sf::Vector2f dir) override 
+    {
         if(!isReady()) return;
         sf::Vector2f vel = normalize(dir)*520.f;
         spawnProjectile(from, vel, damage, true, piercing, 10.f, Pal::Projectile);
