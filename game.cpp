@@ -301,7 +301,10 @@ public:
         spawnProjectile(from, vel, damage, true, piercing, 10.f, Pal::Projectile);
         resetClock();
     }
-    std::string getName() const override { return "RANGED"; }
+    string getName() const override 
+    { 
+        return "RANGED"; 
+    }
     float getMult() const override { return 1.2f; }
 };
 
