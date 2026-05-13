@@ -614,7 +614,10 @@ public:
           contactDamage(cd), contactTimer(0.f), bodyColor(c),
           formationOffset(fOff), animT(0.f), speed(spd) {}
 
-    void attack(sf::Vector2f /*dir*/) override {}
+    void attack(sf::Vector2f ) override {
+        // this is a function overrided from avatar but the minions donot attack
+    // so we leave it empty.
+    }
 
     bool tryContactDamage(Avatar* target, float dt){
         contactTimer -= dt;
