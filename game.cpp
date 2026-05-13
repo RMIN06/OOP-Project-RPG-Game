@@ -866,9 +866,9 @@ public:
        
         float ratio = getHPRatio();
         int shouldHaveSummoned = 0;
-        if(ratio < 0.65f) 
+        if(ratio < 0.80f) 
        {
-        shouldHaveSummoned = 1;
+        shouldHaveSummoned = 3;
        } 
         if(ratio < 0.30f) 
         {
