@@ -261,26 +261,41 @@ public:
 class MeleeMove : public Move {
     float lifesteal;
 public:
-    float heroHealRef; // set externally to hero's currentHP pointer proxy
-    std::function<void(float)> onHeal;
+    float heroHealRef;
+    function<void(float)> onHeal;
 
-    MeleeMove(const std::string& n, float dmg, float cd, float ls)
-        : Move(n,dmg,cd,80.f), lifesteal(ls) {}
+    MeleeMove(const string& n, float dmg, float cd, float ls) : Move(n,dmg,cd,80.f), lifesteal(ls) {}
 
-    void trigger(sf::Vector2f from, sf::Vector2f dir) override {
-        if(!isReady()) return;
-        // Melee: spawn a very fast short-lived projectile (acts as hitbox)
+    void trigger(sf::Vector2f from, sf::Vector2f dir) override 
+    {
+        if(!isReady())
+        {
+            return;
+        }
+    
         sf::Vector2f vel = normalize(dir)*600.f;
         spawnProjectile(from, vel, damage, true, false, 18.f, sf::Color(255,220,80));
         resetClock();
-        if(onHeal) onHeal(damage * lifesteal);
+        if(onHeal) 
+        {
+            onHeal(damage * lifesteal);
+        }
     }
-    std::string getName() const override { return "MELEE"; }
-    float getMult() const override { return 1.0f; }
-    float getLifesteal() const { return lifesteal; }
+    string getName() const override 
+    { 
+        return "MELEE"; 
+    }
+    float getMult() const override 
+    { 
+        return 1.0f; 
+    }
+    float getLifesteal() const 
+    { 
+        return lifesteal; 
+    }
 };
 
-// ─── RangedMove ──────────────────────────────────────────────────────────────
+
 class RangedMove : public Move {
     bool piercing;
 public:
@@ -288,7 +303,11 @@ public:
 
     void trigger(sf::Vector2f from, sf::Vector2f dir) override 
     {
-        if(!isReady()) return;
+        if(!isReady())
+        {
+            return;
+        }
+        
         sf::Vector2f vel = normalize(dir)*520.f;
         spawnProjectile(from, vel, damage, true, piercing, 10.f, Pal::Projectile);
         resetClock();
@@ -297,32 +316,51 @@ public:
     { 
         return "RANGED"; 
     }
-    float getMult() const override { return 1.2f; }
+    float getMult() const override 
+    { 
+        return 1.2f; 
+    }
 };
 
-// ─── SpecialMove ─────────────────────────────────────────────────────────────
+
+
+
 class SpecialMove : public Move {
     float aoeRadius;
     bool  isAoE;
 public:
-    // AoE burst: spawns 8 projectiles in a ring
-    SpecialMove(const std::string& n, float dmg, float cd, float rad)
-        : Move(n,dmg,cd,rad), aoeRadius(rad), isAoE(true) {}
 
-    void trigger(sf::Vector2f from, sf::Vector2f /*dir*/) override {
-        if(!isReady()) return;
-        // Fire 8 projectiles in all directions
-        for(int i=0;i<8;i++){
+    SpecialMove(const string& n, float dmg, float cd, float rad) : Move(n,dmg,cd,rad), aoeRadius(rad), isAoE(true) {}
+
+    void trigger(sf::Vector2f from, sf::Vector2f) override 
+    {
+        if(!isReady())
+        {
+            return;
+        }
+
+        for(int i=0;i<8;i++)
+        {
             float angle = (PI*2.f/8.f)*i;
-            sf::Vector2f vel(std::cos(angle)*380.f, std::sin(angle)*380.f);
+            sf::Vector2f vel(cos(angle)*380.f, sin(angle)*380.f);
             spawnProjectile(from, vel, damage, true, false, 14.f, Pal::AoEFlash);
         }
+
         pushFlash("SPECIAL BURST!", Pal::AoEFlash, from);
         resetClock();
     }
-    std::string getName() const override { return "SPECIAL"; }
-    float getMult() const override { return 2.0f; }
-    float getAoERadius() const { return aoeRadius; }
+    string getName() const override 
+    { 
+        return "SPECIAL"; 
+    }
+    float getMult() const override 
+    { 
+        return 2.0f; 
+    }
+    float getAoERadius() const 
+    { 
+        return aoeRadius; 
+    }
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -394,6 +432,8 @@ public:
         sf::RectangleShape bg({barW, 8.f});
         bg.setPosition(sf::Vector2f(bx, by));
         bg.setFillColor(sf::Color(40,40,40));
+        bg.setOutlineThickness(1.5f);
+        bg.setOutlineColor(sf::Color::Black);
         win.draw(bg);
 
         sf::RectangleShape fill({barW*ratio, 8.f});
@@ -792,25 +832,29 @@ class Villain : public Avatar {
 
 public:
     Villain(const sf::Texture* tex=nullptr)
-        : Avatar("Dr. Vroomstein", 150.f, 1200.f, {SCREEN_W/2.f, 200.f}, 60.f, tex),
+        : Avatar("Dr. Vroomstein", 175.f, 1300.f, {SCREEN_W/2.f, 200.f}, 55.f, tex),
           state(VillainState::IDLE), stateTimer(2.f), moveTimer(0.f),
           targetPos(SCREEN_W/2.f, 200.f), animT(0.f), summonThreshold(3),
           summonsSent(0), shootTimer(0.f), chargeSpeed(0.f),
           chargeDir(0,0), charging(false), eyeT(0.f) {}
 
-    void setSummonCallback(std::function<void()> cb){ onSummon = cb; }
+    void setSummonCallback(function<void()> cb){ onSummon = cb; }
 
     void attack(sf::Vector2f dir) override {
         // Shoot at hero
+        
         sf::Vector2f vel = normalize(dir)*320.f;
         spawnProjectile(pos, vel, 18.f, false, false, 12.f, Pal::EnemyProj);
+        
         // Extra spread
-        float angle = std::atan2(dir.y,dir.x);
+       
+        float angle = atan2(dir.y,dir.x);
         float spread = 0.35f;
-        sf::Vector2f v2(std::cos(angle+spread)*300.f, std::sin(angle+spread)*300.f);
-        sf::Vector2f v3(std::cos(angle-spread)*300.f, std::sin(angle-spread)*300.f);
-        spawnProjectile(pos, v2, 14.f, false, false, 10.f, Pal::EnemyProj);
-        spawnProjectile(pos, v3, 14.f, false, false, 10.f, Pal::EnemyProj);
+        sf::Vector2f v2(cos(angle+spread)*300.f,sin(angle+spread)*300.f);
+        sf::Vector2f v3(cos(angle-spread)*300.f,sin(angle-spread)*300.f);
+        spawnProjectile(pos, v2, 15.f, false, false, 10.f, Pal::EnemyProj);
+        spawnProjectile(pos, v3, 15.f, false, false, 10.f, Pal::EnemyProj);
+    
     }
 
     void move(float dt, sf::Vector2f heroPos) override {
@@ -819,14 +863,29 @@ public:
         tickFlash(dt);
 
         // Check HP thresholds for summons
+       
         float ratio = getHPRatio();
         int shouldHaveSummoned = 0;
-        if(ratio < 0.75f) shouldHaveSummoned = 1;
-        if(ratio < 0.50f) shouldHaveSummoned = 2;
-        if(ratio < 0.25f) shouldHaveSummoned = 3;
-        if(summonsSent < shouldHaveSummoned){
+        if(ratio < 0.80f) 
+       {
+        shouldHaveSummoned = 2;
+       } 
+        if(ratio < 0.40f) 
+        {
+            shouldHaveSummoned = 3;
+        }
+
+        if(ratio < 0.30f) 
+        {
+            shouldHaveSummoned = 4;
+        }
+        if(summonsSent < shouldHaveSummoned)
+        {
             summonsSent++;
-            if(onSummon){ onSummon(); pushFlash("MINIONS SUMMONED!", Pal::MinionV); }
+            if(onSummon)
+            { 
+                onSummon(); pushFlash("MINIONS SUMMONED!", Pal::MinionV); 
+            }
         }
 
         stateTimer -= dt;
