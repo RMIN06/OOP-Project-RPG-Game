@@ -642,7 +642,7 @@ public:
             if(hitFlash > 0.f) sprite.setColor(sf::Color::White);
             win.draw(sprite);
         } else {
-            // Diamond body
+            // if there is no png of minion then it would draw a simple black circle with two red small circles on top.
             sf::ConvexShape diamond;
             diamond.setPointCount(4);
             float r = bodyRadius;
@@ -665,8 +665,7 @@ public:
             pupil.setPosition(sf::Vector2f(pos.x+1.f, pos.y-2.f));
             win.draw(pupil);
         }
-
-        drawHPBar(win, 50.f);
+        drawHPBar(win,50.f);
     }
 };
 
